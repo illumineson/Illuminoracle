@@ -5,6 +5,1276 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Oracle du Jour — Illumin&Son</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+
+  body {
+    background: linear-gradient(160deg,#04080f 0%,#0a1535 50%,#081028 100%);
+    min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Cormorant Garamond',serif;
+  }
+
+  .oracle-scene {
+    display:flex; flex-direction:column; align-items:center;
+    gap:20px; padding:32px 20px 48px;
+    width:100%; max-width:460px;
+    position:relative; overflow:hidden;
+  }
+
+  .logo-text {
+    font-family:'Cinzel Decorative',serif;
+    font-size:20px; letter-spacing:0.14em; color:#c9a84c;
+    text-shadow:0 0 24px rgba(180,140,60,0.4); text-align:center;
+  }
+  .sub-text {
+    font-family:'Cormorant Garamond',serif; font-size:16px;
+    letter-spacing:0.3em; color:rgba(180,140,60,0.5);
+    text-transform:uppercase; margin-top:4px; text-align:center;
+  }
+  .divline {
+    width:80px; height:1px;
+    background:linear-gradient(90deg,transparent,rgba(180,140,60,0.6),transparent);
+  }
+  .ether-text {
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:18px; letter-spacing:0.12em;
+    color:rgba(180,140,60,0); text-align:center; height:26px;
+    transition:color 0.8s ease; pointer-events:none;
+  }
+  .ether-text.visible { color:rgba(180,140,60,0.75); }
+
+  /* ── Carte ── */
+  .card-stage {
+    position:relative; width:250px; height:375px;
+    perspective:1000px; flex-shrink:0;
+  }
+  .card-spin {
+    width:100%; height:100%;
+    position:relative; transform-style:preserve-3d;
+    transform-origin:center center;
+  }
+  .card-face {
+    position:absolute; inset:0;
+    backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    border-radius:12px; overflow:hidden;
+    box-shadow:0 8px 48px rgba(0,0,0,0.8),0 0 40px rgba(180,140,60,0.15);
+  }
+  .card-front { transform:rotateY(180deg); }
+
+  .card-glow {
+    position:absolute; inset:-14px; border-radius:26px;
+    pointer-events:none; opacity:0;
+    box-shadow:0 0 50px rgba(201,168,76,0.55);
+  }
+
+  /* ── Bouton ── */
+  .btn-reveal {
+    font-family:'Cinzel Decorative',serif; font-size:14px;
+    letter-spacing:0.2em; color:#c9a84c; background:transparent;
+    border:1px solid rgba(180,140,60,0.55); border-radius:4px;
+    padding:16px 32px; cursor:pointer; transition:all 0.3s;
+  }
+  .btn-reveal:hover { background:rgba(180,140,60,0.1); box-shadow:0 0 20px rgba(180,140,60,0.2); }
+
+  /* ── Message ── */
+  .msg-box {
+    max-width:400px; width:100%;
+    background:rgba(10,18,50,0.8); border:1px solid rgba(180,140,60,0.25);
+    border-radius:12px; padding:24px 26px; text-align:center;
+    opacity:0; transform:translateY(14px);
+    transition:opacity 1.4s ease,transform 1.4s ease; pointer-events:none;
+  }
+  .msg-box.show { opacity:1; transform:translateY(0); pointer-events:all; }
+  .msg-label {
+    font-family:'Cinzel Decorative',serif; font-size:11px;
+    letter-spacing:0.35em; color:rgba(180,140,60,0.75); margin-bottom:14px;
+    font-weight:700;
+  }
+  .msg-text {
+    font-family:'Cormorant Garamond',serif; font-size:19px;
+    font-style:italic; line-height:1.85; color:#ddd0b8;
+  }
+
+  /* ── Panneaux ── */
+  .panels {
+    display:flex; flex-direction:column; gap:12px;
+    max-width:400px; width:100%;
+    opacity:0; transform:translateY(10px);
+    transition:opacity 1.2s ease 0.4s,transform 1.2s ease 0.4s;
+    pointer-events:none;
+  }
+  .panels.show { opacity:1; transform:translateY(0); pointer-events:all; }
+  .panel-row { display:flex; gap:12px; }
+  .panel {
+    flex:1; border-radius:8px; padding:14px 16px;
+    font-family:'Cormorant Garamond',serif; font-size:22px; line-height:1.65;
+  }
+  .panel-label {
+    font-family:'Cinzel Decorative',serif; font-size:11px;
+    letter-spacing:0.28em; display:block; margin-bottom:8px; opacity:0.85;
+    font-weight:700;
+  }
+  .panel.lumiere { background:rgba(201,168,76,0.07); border:0.5px solid rgba(201,168,76,0.25); color:#d4b96a; }
+  .panel.ombre   { background:rgba(80,40,10,0.18);   border:0.5px solid rgba(180,100,40,0.22); color:#b07840; }
+  .panel.vigilance {
+    background:rgba(30,25,55,0.3); border:0.5px solid rgba(140,110,180,0.22);
+    color:#b8a8d0; font-style:italic;
+  }
+
+  /* ── Date + Titre carte ── */
+  .card-date {
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:18px; letter-spacing:0.12em; color:rgba(201,168,76,0.65);
+    text-align:center;
+    opacity:0; transition:opacity 1.2s ease 0.2s; pointer-events:none;
+  }
+  .card-date.show { opacity:1; }
+  .card-titre {
+    font-family:'Cinzel Decorative',serif;
+    font-size:13px; letter-spacing:0.18em; color:#c9a84c;
+    text-align:center; line-height:1.5;
+    opacity:0; transition:opacity 1.2s ease 0.3s; pointer-events:none;
+  }
+  .card-titre.show { opacity:1; }
+
+  /* ── Bouton partager ── */
+  .btn-share {
+    width:100%; font-family:'Cormorant Garamond',serif;
+    font-size:19px; letter-spacing:0.1em; color:#c9a84c;
+    background:rgba(201,168,76,0.06);
+    border:1px solid rgba(180,140,60,0.5);
+    border-radius:4px; padding:14px 20px;
+    cursor:pointer; transition:all 0.3s; display:block; text-align:center;
+  }
+  .btn-share:hover { background:rgba(180,140,60,0.12); border-color:#c9a84c; }
+
+  /* ── Zone de capture pour partage (hors écran) ── */
+  #shareCanvas {
+    position:fixed; left:-9999px; top:0;
+    width:420px;
+    background: linear-gradient(160deg,#04080f 0%,#0a1535 50%,#081028 100%);
+    padding:40px 28px 36px;
+    font-family:'Cormorant Garamond',serif;
+    color:#ddd0b8;
+  }
+  #shareCanvas .sh-logo {
+    font-family:'Cinzel Decorative',serif; font-size:18px;
+    letter-spacing:0.14em; color:#c9a84c; text-align:center; margin-bottom:4px;
+  }
+  #shareCanvas .sh-sub {
+    font-family:'Cormorant Garamond',serif; font-size:13px;
+    letter-spacing:0.3em; color:rgba(180,140,60,0.5);
+    text-transform:uppercase; text-align:center; margin-bottom:20px;
+  }
+  #shareCanvas .sh-card {
+    display:flex; justify-content:center; margin-bottom:20px;
+  }
+  #shareCanvas .sh-date {
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:16px; letter-spacing:0.12em; color:rgba(201,168,76,0.65);
+    text-align:center; margin-bottom:8px;
+  }
+  #shareCanvas .sh-titre {
+    font-family:'Cinzel Decorative',serif; font-size:12px;
+    letter-spacing:0.18em; color:#c9a84c;
+    text-align:center; margin-bottom:18px;
+  }
+  #shareCanvas .sh-msg {
+    font-style:italic; font-size:15px; line-height:1.8;
+    color:#ddd0b8; text-align:center; margin-bottom:22px;
+    padding:0 8px;
+  }
+  #shareCanvas .sh-panel {
+    border-radius:8px; padding:12px 16px;
+    font-size:14px; line-height:1.55; margin-bottom:10px;
+  }
+  #shareCanvas .sh-panel-label {
+    font-family:'Cinzel Decorative',serif; font-size:8px;
+    letter-spacing:0.28em; display:block; margin-bottom:5px;
+    opacity:0.85; font-weight:700;
+  }
+  #shareCanvas .sh-lum {
+    background:rgba(201,168,76,0.1); border:0.5px solid rgba(201,168,76,0.3); color:#d4b96a;
+  }
+  #shareCanvas .sh-omb {
+    background:rgba(80,40,10,0.25); border:0.5px solid rgba(180,100,40,0.3); color:#b07840;
+  }
+  #shareCanvas .sh-vig {
+    background:rgba(30,25,55,0.4); border:0.5px solid rgba(140,110,180,0.3);
+    color:#b8a8d0; font-style:italic;
+  }
+  #shareCanvas .sh-footer {
+    font-family:'Cinzel Decorative',serif; font-size:9px;
+    letter-spacing:0.2em; color:rgba(180,140,60,0.4);
+    text-align:center; margin-top:24px;
+  }
+  .cta-row {
+    display:flex; gap:12px; flex-direction:column; align-items:center;
+    width:100%; max-width:400px;
+    opacity:0; transition:opacity 1.2s ease 0.8s; pointer-events:none;
+  }
+  .cta-row.show { opacity:1; pointer-events:all; }
+  .btn-rdv {
+    width:100%; font-family:'Cinzel Decorative',serif;
+    font-size:13px; letter-spacing:0.18em; color:#06090f;
+    background:linear-gradient(135deg,#a07828,#c9a84c,#f0d080);
+    border:none; border-radius:4px; padding:16px 20px;
+    cursor:pointer; transition:all 0.3s; text-decoration:none;
+    display:block; text-align:center;
+  }
+  .btn-rdv:hover { opacity:0.88; transform:translateY(-1px); }
+  .btn-contact {
+    width:100%; font-family:'Cormorant Garamond',serif;
+    font-size:19px; letter-spacing:0.1em; color:#c9a84c;
+    background:transparent; border:1px solid rgba(180,140,60,0.4);
+    border-radius:4px; padding:14px 20px;
+    cursor:pointer; transition:all 0.3s; text-decoration:none;
+    display:block; text-align:center;
+  }
+  .btn-contact:hover { border-color:#c9a84c; background:rgba(180,140,60,0.06); }
+
+  /* ── Demain ── */
+  .tomorrow-box {
+    max-width:400px; width:100%; text-align:center;
+    padding:16px 20px;
+    background:rgba(10,18,50,0.5); border:1px solid rgba(180,140,60,0.15);
+    border-radius:10px;
+    opacity:0; transition:opacity 1.2s ease 1s; pointer-events:none;
+  }
+  .tomorrow-box.show { opacity:1; }
+  .tomorrow-text {
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:19px; letter-spacing:0.07em; color:rgba(180,140,60,0.65); line-height:1.75;
+  }
+
+  /* ── Déjà tiré ── */
+  .already-box {
+    max-width:400px; width:100%; text-align:center;
+    padding:30px 24px;
+    background:rgba(10,18,50,0.8); border:1px solid rgba(180,140,60,0.25);
+    border-radius:12px;
+  }
+  .already-title {
+    font-family:'Cinzel Decorative',serif; font-size:13px;
+    letter-spacing:0.22em; color:#c9a84c; margin-bottom:16px;
+  }
+  .already-text {
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:19px; line-height:1.85; color:#ddd0b8; margin-bottom:18px;
+  }
+
+  /* ── Disclaimer après tirage ── */
+  .disclaimer {
+    max-width:400px; width:100%; text-align:center;
+    padding:14px 18px;
+    opacity:0; transition:opacity 1.2s ease 1.2s; pointer-events:none;
+  }
+  .disclaimer.show { opacity:1; pointer-events:all; }
+
+  /* ── Disclaimer accueil ── */
+  .disclaimer-accueil {
+    max-width:400px; width:100%; text-align:center;
+    padding:14px 18px;
+  }
+
+  /* Texte commun aux deux disclaimers */
+  .disclaimer-text {
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:17px; letter-spacing:0.05em; color:rgba(220,195,140,0.55); line-height:1.75;
+  }
+
+  .spark { position:absolute; border-radius:50%; pointer-events:none; opacity:0; }
+
+  /* ── Reset ── */
+  .btn-reset {
+    width:100%; max-width:400px;
+    background:transparent;
+    border:1px solid rgba(180,140,60,0.28);
+    border-radius:4px; padding:12px 20px; cursor:pointer;
+    transition:all 0.3s; margin-top:4px;
+    opacity:0.45; min-height:42px;
+  }
+  .btn-reset:hover { opacity:0.75; border-color:rgba(180,140,60,0.55); }
+</style>
+</head>
+<body>
+<div class="oracle-scene" id="scene">
+
+  <div>
+    <div class="logo-text">Illumin&amp;Son</div>
+    <div class="sub-text">Oracle du Jour</div>
+  </div>
+  <div class="divline"></div>
+  <div class="ether-text" id="etherText">L'éther se connecte à ton âme…</div>
+
+  <!-- CARTE -->
+  <div class="card-stage" id="cardStage">
+    <div class="card-glow" id="cardGlow"></div>
+    <div class="card-spin" id="cardSpin">
+      <!-- DOS — SVG identique carte_3 mais avec fleur de vie -->
+      <div class="card-face card-back" id="cardBack"></div>
+      <!-- FACE tirée -->
+      <div class="card-face card-front" id="cardFront"></div>
+    </div>
+  </div>
+
+  <button class="btn-reveal" id="btnReveal">✦ &nbsp;Révèle ta carte du jour&nbsp; ✦</button>
+
+  <!-- Disclaimer visible dès l'accueil sous le bouton -->
+  <div class="disclaimer-accueil" id="disclaimerAccueil">
+    <div class="disclaimer-text">Cet oracle est un outil de réflexion et d'inspiration personnelle. Il ne prétend pas détenir la vérité sur ta vie, tes choix ou ton avenir. Seul·e toi sais ce qui est juste pour toi. Accueille ce message comme une invitation à regarder en toi — non comme une certitude.</div>
+  </div>
+
+  <!-- Date + Titre AVANT le message -->
+  <div class="card-date" id="cardDate"></div>
+  <div class="card-titre" id="cardTitre"></div>
+
+  <div class="msg-box" id="msgBox">
+    <div class="msg-label">Message du jour</div>
+    <div class="msg-text" id="msgText"></div>
+  </div>
+
+  <div class="panels" id="panels">
+    <div class="panel-row">
+      <div class="panel lumiere">
+        <span class="panel-label">✦ Lumière</span>
+        <span id="panLumiere"></span>
+      </div>
+      <div class="panel ombre">
+        <span class="panel-label">◆ Ombre</span>
+        <span id="panOmbre"></span>
+      </div>
+    </div>
+    <div class="panel vigilance">
+      <span class="panel-label">⚠ Vigilance</span>
+      <span id="panVigilance"></span>
+    </div>
+  </div>
+
+  <div class="cta-row" id="ctaRow">
+    <a class="btn-rdv" href="https://www.sumupbookings.com/illumin-son" target="_blank" rel="noopener">✦ &nbsp;Prendre rendez-vous&nbsp; ✦</a>
+    <a class="btn-contact" href="https://www.linktree.com/illumineson" target="_blank" rel="noopener">Nous contacter</a>
+    <button class="btn-share" id="btnShare" onclick="partagerCarte()">✦ &nbsp;Partager ma carte du jour&nbsp; ✦</button>
+  </div>
+
+  <!-- Zone de capture hors écran pour html2canvas -->
+  <div id="shareCanvas"></div>
+
+  <div class="tomorrow-box" id="tomorrowBox">
+    <div class="tomorrow-text">Ton oracle se renouvelle chaque jour.<br>Reviens demain pour un nouveau message 🌙</div>
+  </div>
+
+  <!-- Disclaimer après tirage — caché au départ, apparaît en bas -->
+  <div class="disclaimer" id="disclaimerBox">
+    <div class="disclaimer-text">Cet oracle est un outil de réflexion et d'inspiration personnelle. Il ne prétend pas détenir la vérité sur ta vie, tes choix ou ton avenir. Seul·e toi sais ce qui est juste pour toi. Accueille ce message comme une invitation à regarder en toi — non comme une certitude.</div>
+  </div>
+
+  <button class="btn-reset" id="btnReset" style="display:none" onclick="resetDraw()"></button>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// DONNÉES — 0 à 33
+// ══════════════════════════════════════════════════════════
+const CARTES = [
+  { n:0, titre:"Le Vide Sacré",
+    msg:"Le 0 est à la fois le début et la fin de toute chose. Il représente le vide pur, mais aussi l'infini — tout ce qui peut naître existe déjà en lui. C'est le nombre de tous les possibles, celui qui n'est limité par rien ni personne. Quand le 0 se présente, c'est une invitation à faire le silence, à laisser l'espace parler avant d'agir.",
+    lumiere:"Potentiel illimité, ouverture totale, capacité à tout accueillir sans jugement.",
+    ombre:"Manque de forme, sentiment de vide, difficulté à trouver une direction claire.",
+    vigilance:"Le silence que tu ressens n'est pas un manque — c'est un espace de création. Laisse quelque chose naître avant de chercher à le remplir." },
+
+  { n:1, titre:"Le Commencement",
+    msg:"Le 1 est le premier souffle, l'élan pur de celui qui ose commencer. Il symbolise l'origine, l'initiative et la force du leader naturel. C'est le nombre de celui qui trace son propre chemin avec confiance et détermination. Si le 1 se présente aujourd'hui, quelque chose en toi est prêt à démarrer — fais-lui confiance.",
+    lumiere:"Leadership naturel, indépendance, courage d'initier, force intérieure.",
+    ombre:"Égocentrisme, impatience, tendance à tout vouloir maîtriser seul.",
+    vigilance:"Ton élan est précieux, mais veille à laisser de la place aux autres. La vraie force sait aussi écouter." },
+
+  { n:2, titre:"L'Alliance",
+    msg:"Le 2 est le nombre de la douceur, du lien et de la coopération. Il cherche l'harmonie, sait voir les deux côtés des choses et préfère unir plutôt que diviser. C'est une énergie de paix, de patience et d'intuition fine. Si le 2 arrive aujourd'hui, les relations autour de toi ont besoin de ta présence bienveillante.",
+    lumiere:"Diplomatie, intuition, sens de la justice, capacité à créer des ponts entre les êtres.",
+    ombre:"Hésitation, dépendance affective, tendance à s'effacer pour éviter les conflits.",
+    vigilance:"Chercher la paix est beau, mais pas au prix de te trahir. Tu as le droit d'avoir tes propres besoins." },
+
+  { n:3, titre:"L'Expression",
+    msg:"Le 3 déborde de vie. C'est le nombre de la créativité, de la parole et de la joie de partager. Il invite à s'exprimer librement, à inspirer les autres et à laisser parler l'artiste qui est en toi. Ceux qui portent le 3 illuminent leur entourage par leur enthousiasme et leur générosité créative.",
+    lumiere:"Créativité, enthousiasme, expression artistique, joie de vivre contagieuse.",
+    ombre:"Dispersion, superficialité, difficulté à finir ce que l'on commence.",
+    vigilance:"Ton énergie créatrice est un don — mais elle a besoin de direction. Choisis ce qui compte vraiment et vas jusqu'au bout." },
+
+  { n:4, titre:"La Fondation",
+    msg:"Le 4 est le pilier. Il représente la solidité, l'ordre et la construction patiente. C'est le nombre de ceux qui bâtissent sur des bases solides, travaillent avec méthode et restent fidèles à leurs engagements. Quand le 4 apparaît, il t'invite à poser des fondations durables et à honorer ce que tu construis.",
+    lumiere:"Stabilité, rigueur, loyauté, sens des responsabilités, travail bien fait.",
+    ombre:"Rigidité, obstination, résistance au changement, difficulté à sortir de la routine.",
+    vigilance:"La structure est une force, mais elle ne doit pas devenir une prison. Permets-toi un peu de souplesse — la vie ne se laisse pas toujours mettre dans des cases." },
+
+  { n:5, titre:"La Liberté",
+    msg:"Le 5 est l'énergie du mouvement, du changement et de l'aventure. Il symbolise la soif de liberté et d'expériences nouvelles. Curieux, social et toujours en quête de quelque chose de vivant, il réveille les sens et bouscule les certitudes installées. Quand le 5 arrive, c'est une invitation à bouger, à explorer, à oser.",
+    lumiere:"Liberté, adaptabilité, curiosité, dynamisme, goût de l'aventure.",
+    ombre:"Instabilité, impulsivité, irresponsabilité, peur de l'engagement.",
+    vigilance:"La liberté est magnifique, mais sans ancrage elle peut devenir fuite. Demande-toi ce que tu cherches vraiment dans ce mouvement." },
+
+  { n:6, titre:"L'Harmonie",
+    msg:"Le 6 est le nombre de l'amour en action. Il représente le soin, la famille, la protection et l'équilibre dans les relations. C'est une énergie généreuse et aimante, naturellement tournée vers le bien des autres. Quand le 6 se présente, il t'invite à chérir tes liens et à prendre soin de ceux qui t'entourent.",
+    lumiere:"Amour, compassion, sens du soin, harmonie familiale, loyauté.",
+    ombre:"Sacrifice excessif, possessivité, tendance à contrôler par amour.",
+    vigilance:"Donner est beau, mais donner trop peut t'épuiser. Prends soin des autres sans t'oublier toi-même." },
+
+  { n:7, titre:"La Quête Intérieure",
+    msg:"Le 7 est le chercheur de sens, le philosophe, l'âme qui va toujours plus loin que les apparences. Il est attiré par les mystères de la vie, la spiritualité et la compréhension profonde. Il a besoin de silence pour penser, de solitude pour ressentir. Quand le 7 se présente, il t'invite à regarder en toi avant de chercher ailleurs.",
+    lumiere:"Spiritualité, intuition profonde, analyse, sagesse intérieure.",
+    ombre:"Isolement, mélancolie, distance avec les autres, repli sur soi.",
+    vigilance:"Ton monde intérieur est riche — mais n'oublie pas ceux qui t'entourent. La sagesse s'épanouit quand elle est partagée." },
+
+  { n:8, titre:"La Puissance",
+    msg:"Le 8 est le nombre de l'ambition et de la force de manifestation. Il représente le pouvoir, la réussite et le karma — ce que tu sèmes, tu le récolteras. Couché, le 8 devient l'infini. Il t'invite à agir avec intégrité, car tout ce que tu construis aujourd'hui aura des conséquences demain.",
+    lumiere:"Ambition, autorité, sens des responsabilités, capacité à bâtir l'abondance.",
+    ombre:"Matérialisme, abus de pouvoir, insensibilité, attachement excessif aux résultats.",
+    vigilance:"Le succès bâti sur l'honnêteté et le respect dure. Rappelle-toi que le pouvoir est un outil, pas un but." },
+
+  { n:9, titre:"L'Achèvement",
+    msg:"Le 9 porte en lui toute la sagesse du chemin parcouru. C'est le nombre de la fin de cycle, de la compassion universelle et du don de soi. Ceux qui le portent ont traversé beaucoup et savent maintenant donner sans compter. Quand le 9 apparaît, quelque chose touche à sa fin — et c'est une belle chose.",
+    lumiere:"Compassion, générosité, sagesse universelle, capacité à lâcher prise avec grâce.",
+    ombre:"Difficulté à clore, amertume, tendance à se sacrifier jusqu'à l'épuisement.",
+    vigilance:"La fin d'un cycle n'est pas une perte — c'est une libération. Permets-toi de fermer cette porte avec gratitude." },
+
+  { n:10, titre:"Le Renouveau",
+    msg:"Le 10 porte l'élan du début, enrichi par le potentiel infini qui l'accompagne. C'est le retour au commencement, mais avec toute la maturité du voyage passé. Une nouvelle page s'ouvre — non par hasard, mais parce que tu es prêt. Ce que tu poses comme intention aujourd'hui a une puissance particulière.",
+    lumiere:"Recommencement éclairé, leadership amplifié, potentiel renouvelé.",
+    ombre:"Indécision face au nouveau départ, tension entre passé et avenir.",
+    vigilance:"Ce nouveau départ t'appartient entièrement. N'attends pas que tout soit parfait pour commencer." },
+
+  { n:11, titre:"L'Illumination",
+    msg:"Le 11 est un nombre maître d'une grande puissance spirituelle. Il représente l'intuition élevée, l'inspiration et le don de percevoir ce que les autres ne voient pas encore. Ceux qui le portent sont souvent des guides, des âmes sensibles appelées à transmettre quelque chose de plus grand qu'elles.",
+    lumiere:"Intuition élevée, inspiration, dons spirituels, capacité à éclairer les autres.",
+    ombre:"Anxiété, surcharge émotionnelle, tension entre le monde spirituel et le quotidien.",
+    vigilance:"Ta sensibilité est une lumière précieuse. Apprends à la protéger autant qu'à la partager." },
+
+  { n:12, titre:"Le Retournement",
+    msg:"Le 12 est le nombre des grands cycles — les 12 mois, les 12 signes. Il porte une énergie de créativité et d'adaptabilité, mais il invite surtout à accepter les tournants de la vie avec sagesse. Parfois ce qui ressemble à un obstacle est simplement une invitation à changer de perspective.",
+    lumiere:"Adaptabilité, créativité, vision d'ensemble, acceptation des cycles naturels.",
+    ombre:"Indécision, dispersion, difficulté à choisir une direction claire.",
+    vigilance:"Avant de décider, prends le temps de regarder la situation autrement. La bonne réponse est peut-être là où tu ne la cherchais pas." },
+
+  { n:13, titre:"La Transformation",
+    msg:"Le 13 est mal compris — ce n'est pas le nombre de la malchance, c'est celui de la renaissance. Il demande de laisser mourir ce qui est déjà terminé, pour que quelque chose de plus libre puisse prendre sa place. C'est un nombre de courage profond et de renouveau intérieur.",
+    lumiere:"Transformation, persévérance, renaissance, capacité à se renouveler en profondeur.",
+    ombre:"Résistance au changement, peur de perdre ce qui est connu, superstitions.",
+    vigilance:"Ce qui se termine en toi ne t'abandonne pas — il te libère. Fais confiance à ce processus, même quand il fait mal." },
+
+  { n:14, titre:"La Tempérance",
+    msg:"Le 14 est le nombre de l'adaptabilité et du mouvement, tempéré par la sagesse du juste milieu. Il invite à trouver l'équilibre entre les extrêmes, à agir sans précipitation, à laisser les choses se mettre en place à leur rythme naturel. La patience est ici une forme de sagesse.",
+    lumiere:"Adaptabilité, liberté bien canalisée, curiosité, capacité d'ajustement.",
+    ombre:"Instabilité, dispersion, difficulté à s'engager durablement.",
+    vigilance:"Le juste milieu n'est pas la médiocrité — c'est la sagesse. Trouve ton rythme et avance avec fluidité." },
+
+  { n:15, titre:"L'Attachement",
+    msg:"Le 15 est un nombre magnétique, tourné vers la beauté, l'harmonie et les relations profondes. Il porte une grande capacité d'amour, mais aussi une intensité qui peut mener à la dépendance. Il invite à distinguer ce qui t'attache par amour de ce qui t'attache par peur.",
+    lumiere:"Amour profond, sens de la beauté, harmonie, compassion dans les liens.",
+    ombre:"Jalousie, possessivité, dépendance affective, tendance à s'oublier dans l'autre.",
+    vigilance:"L'amour vrai laisse de l'espace. Ce que tu retiens trop fort finit par s'étouffer." },
+
+  { n:16, titre:"L'Éclair",
+    msg:"Le 16 est le nombre de l'éveil soudain. Ce qui s'effondre était peut-être fragile depuis longtemps — l'éclair ne détruit pas, il révèle. Ce qui reste après est solide et vrai. Il t'invite à accepter ce qui se bouscule plutôt que d'y résister, car dans la rupture se cache souvent une libération.",
+    lumiere:"Éveil spirituel, courage de voir la vérité, capacité à se reconstruire après une rupture.",
+    ombre:"Arrogance, illusions entretenues, isolement, résistance aux vérités difficiles.",
+    vigilance:"Ce qui se brise aujourd'hui te fait de la place. Ce qui résiste est ce qui est réel." },
+
+  { n:17, titre:"L'Étoile",
+    msg:"Le 17 est le nombre de la résilience et de la foi. Même après les tempêtes les plus difficiles, il garde espoir et sait transformer les épreuves en force. C'est l'étoile qui brille dans la nuit — discrète mais constante. Quand le 17 se présente, rappelle-toi que la lumière est là, même si tu ne la vois pas encore.",
+    lumiere:"Résilience, persévérance, foi en l'avenir, force née de l'épreuve.",
+    ombre:"Entêtement, auto-sabotage, refus de demander de l'aide.",
+    vigilance:"Ta force intérieure est réelle, mais elle n'a pas à tout porter seule. Laisser quelqu'un t'aider n'est pas une faiblesse." },
+
+  { n:18, titre:"L'Illusion",
+    msg:"Le 18 est le nombre des eaux profondes — peurs cachées, rêves qui parlent fort, émotions qui brouillent le regard. Il porte une grande sensibilité et une intuition puissante, mais aussi un risque de confusion entre ce qui est réel et ce que l'on s'imagine. Il invite à regarder honnêtement ce qui se passe en soi.",
+    lumiere:"Profondeur émotionnelle, intuition fine, compassion, capacité à percevoir ce qui est caché.",
+    ombre:"Confusion, peurs irrationnelles, auto-sabotage, tendance à l'illusion.",
+    vigilance:"Apprends à distinguer ce qui vient de ton intuition et ce qui vient de ta peur. Ils ne te guident pas vers le même endroit." },
+
+  { n:19, titre:"Le Soleil",
+    msg:"Le 19 est le nombre de la renaissance lumineuse. Il porte en lui à la fois l'élan du début et la sagesse de celui qui a tout traversé. C'est une belle énergie de joie, de réussite gagnée et de rayonnement sincère. Quand le 19 se présente, laisse ta lumière briller — elle est méritée.",
+    lumiere:"Joie, vitalité, succès issu de l'expérience, rayonnement bienveillant.",
+    ombre:"Narcissisme, besoin excessif de reconnaissance, immaturité émotionnelle.",
+    vigilance:"Brille — mais en illuminant aussi ceux qui sont dans l'ombre. La lumière partagée brûle plus longtemps." },
+
+  { n:20, titre:"L'Éveil",
+    msg:"Le 20 est une énergie de sensibilité profonde et d'intuition décuplée. Quelque chose s'éveille, un appel intérieur se lève doucement. Il demande de lui prêter attention, même si tu ne comprends pas encore tout ce qu'il signifie. La coopération et l'écoute sont tes meilleurs alliés aujourd'hui.",
+    lumiere:"Intuition amplifiée, sensibilité spirituelle, coopération, capacité de médiation.",
+    ombre:"Indécision, émotivité excessive, dépendance au regard des autres.",
+    vigilance:"Ce que tu ressens profondément est une information précieuse. Fais-lui confiance, même sans pouvoir l'expliquer." },
+
+  { n:21, titre:"L'Accomplissement",
+    msg:"Le 21 est le nombre de l'accomplissement joyeux. Il porte une créativité épanouie, un charme naturel et une capacité à rassembler les gens autour de projets beaux et vivants. Quelque chose se complète en toi aujourd'hui — accueille-le avec légèreté et célèbre ce que tu as accompli.",
+    lumiere:"Optimisme, créativité accomplie, charme, capacité à rassembler et à inspirer.",
+    ombre:"Dispersion, impulsivité, tendance à ne pas aller au fond des choses.",
+    vigilance:"Tu mérites de célébrer ce que tu as construit. Permets-toi de le voir vraiment." },
+
+  { n:22, titre:"Le Maître Bâtisseur",
+    msg:"Le 22 est le Maître Bâtisseur. Il possède le don rare de transformer les rêves les plus ambitieux en réalités concrètes. C'est un nombre d'une puissance immense qui porte une grande responsabilité. Ce que tu construis peut dépasser ton seul destin et toucher la vie de nombreuses personnes autour de toi.",
+    lumiere:"Vision grandiose, pouvoir de manifestation, leadership altruiste, détermination hors du commun.",
+    ombre:"Pression excessive sur soi-même, perfectionnisme paralysant, peur de l'échec.",
+    vigilance:"Tes rêves sont grands — c'est exactement comme ça doit être. Mais avancer imparfaitement vaut toujours mieux que rester immobile." },
+
+  { n:23, titre:"La Grâce",
+    msg:"Le 23 est un nombre de communication fluide et de liens qui s'ouvrent avec aisance. Il porte un charme naturel et une facilité à créer du lien avec les autres. Les portes s'ouvrent pour ceux qui avancent avec confiance et sincérité. Aujourd'hui, ta présence et tes mots ont une valeur toute particulière.",
+    lumiere:"Adaptabilité, communication naturelle, charme, facilité à créer du lien.",
+    ombre:"Inconstance, manque de direction, tendance à se disperser dans trop de directions.",
+    vigilance:"Ton énergie sociale est un don, mais elle a besoin d'un cap. Vers quoi veux-tu vraiment t'orienter ?" },
+
+  { n:24, titre:"L'Amour Actif",
+    msg:"Le 24 est le nombre du foyer, des liens qui se construisent dans les petits gestes du quotidien. Il porte une énergie d'amour ancré dans la durée, la stabilité et la fidélité. L'amour vrai ne se déclare pas seulement en mots — il se prouve jour après jour, dans l'attention et la constance.",
+    lumiere:"Amour concret, fidélité, sens des responsabilités, protection des êtres chers.",
+    ombre:"Surprotection, tendance à porter les fardeaux des autres, difficulté à laisser l'autre être libre.",
+    vigilance:"Aimer ne signifie pas tout contrôler. Laisse un peu d'espace dans tes liens — c'est là que l'amour peut vraiment respirer." },
+
+  { n:25, titre:"La Sagesse Intuitive",
+    msg:"Le 25 est le nombre de celui qui perçoit avant de comprendre. C'est une énergie d'introspection profonde et de quête de vérité intérieure. Ceux qui le portent ont une sagesse naturelle et une manière unique de toucher à des vérités que les autres n'ont pas encore vues. Le silence leur parle.",
+    lumiere:"Intuition profonde, sagesse intérieure, discernement, sens de l'observation.",
+    ombre:"Tendance à s'isoler, doute de soi, mélancolie, attente d'être certain avant d'agir.",
+    vigilance:"Ce que tu perçois au fond de toi mérite d'être accueilli avec confiance. Ta sensibilité est un cadeau, pas une fragilité." },
+
+  { n:26, titre:"Le Pouvoir Ancré",
+    msg:"Le 26 est un nombre de construction sérieuse et de leadership pragmatique. Il allie ambition et discipline, et invite à bâtir avec méthode et intégrité. Tout ce que tu construis aujourd'hui avec honnêteté et rigueur peut devenir quelque chose de solide, de durable et de respecté.",
+    lumiere:"Discipline, détermination, sens pratique, capacité à organiser et à diriger.",
+    ombre:"Rigidité, obsession du contrôle, froideur dans les relations humaines.",
+    vigilance:"La structure est nécessaire, mais n'oublie pas de rester humain dans tes décisions. Le pouvoir qui dure est celui qui respecte." },
+
+  { n:27, titre:"L'Inspiration",
+    msg:"Le 27 est le nombre de l'âme qui guide sans s'imposer, qui partage sa lumière avec douceur et générosité. Il porte une compassion universelle et une intuition spirituelle profonde. Ce que tu transmets aujourd'hui — même sans le savoir consciemment — peut toucher quelqu'un en profondeur.",
+    lumiere:"Altruisme, compassion, intuition spirituelle, capacité à inspirer et à guérir par la présence.",
+    ombre:"Illusions, vulnérabilité aux énergies des autres, tendance à se perdre dans l'idéal.",
+    vigilance:"Tu portes une belle lumière. Veille à ne pas t'oublier en la donnant — prendre soin de toi est aussi une forme de service." },
+
+  { n:28, titre:"Le Chef Solitaire",
+    msg:"Le 28 est un nombre de force, d'initiative et de détermination. Il porte une ambition naturelle et une capacité à prendre la tête avec intégrité. Mais derrière cette puissance se cache parfois une solitude — celle de celui qui avance vite et qui oublie de laisser les autres le rejoindre.",
+    lumiere:"Ambition juste, détermination, initiative, capacité à mener avec intégrité.",
+    ombre:"Isolement, obstination, matérialisme, difficulté à accepter l'aide des autres.",
+    vigilance:"Ta force s'épanouit encore plus quand elle s'ouvre aux autres. Les plus belles réussites se construisent ensemble." },
+
+  { n:29, titre:"L'Épreuve de la Foi",
+    msg:"Le 29 est un nombre maître de haute sensibilité qui porte à la fois une lumière spirituelle intense et des épreuves qui demandent une foi absolue. Ce que tu traverses en ce moment a une raison d'être, même si elle n'est pas encore visible. Quelque chose de plus grand est à l'œuvre dans ta vie.",
+    lumiere:"Foi profonde, résilience, intuition spirituelle, capacité à traverser l'adversité.",
+    ombre:"Émotions instables, mélancolie, tendance au pessimisme ou à dramatiser.",
+    vigilance:"Ce que tu vis te transforme, même si tu ne le vois pas encore. Fais confiance au processus — tu ressortiras de cette traversée plus libre et plus fort." },
+
+  { n:30, titre:"La Créativité Pure",
+    msg:"Le 30 est l'expression créatrice à son sommet, amplifiée par un potentiel sans limites. C'est la joie débordante qui cherche à être partagée, l'artiste qui veut donner au monde ce qu'il a en lui. Tout ce qui veut naître en toi mérite de s'exprimer aujourd'hui — sans retenue et sans censure.",
+    lumiere:"Créativité amplifiée, optimisme contagieux, joie de vivre, générosité dans le partage.",
+    ombre:"Dispersion, insouciance, besoin excessif d'attention et de validation.",
+    vigilance:"Exprimer est beau — mais aller au bout l'est encore plus. Ce qui est créé avec constance laisse une trace bien plus profonde." },
+
+  { n:31, titre:"La Création Ancrée",
+    msg:"Le 31 est le nombre de l'artisan du sacré — celui qui transforme une inspiration en quelque chose de concret, de solide et de durable. Il marie la créativité et la discipline dans une union rare et puissante. Ce que tu fais avec tes mains et ton cœur porte une empreinte que personne d'autre ne peut créer à ta place.",
+    lumiere:"Créativité disciplinée, originalité, ambition constructive, sens du travail bien fait.",
+    ombre:"Perfectionnisme paralysant, isolement créateur, mélancolie face à l'idéal non atteint.",
+    vigilance:"L'œuvre parfaite n'existe pas — mais l'œuvre faite avec amour, si. Lance-toi, même imparfaitement." },
+
+  { n:32, titre:"La Parole Sacrée",
+    msg:"Le 32 est le nombre de ceux qui savent tisser des liens par les mots, ouvrir des portes avec les bonnes paroles au bon moment. Il porte une fluidité naturelle dans la communication et une grande adaptabilité. Ce que tu dis aujourd'hui avec intention et sincérité a un pouvoir réel sur ce qui t'entoure.",
+    lumiere:"Communication inspirée, adaptabilité, don pour les mots, capacité à créer des liens.",
+    ombre:"Instabilité, manipulation douce, difficulté à tenir ses engagements dans la durée.",
+    vigilance:"Tes mots ont du pouvoir — utilise-les avec soin et amour. Ce qui est dit avec clarté peut changer une relation, une situation, une vie." },
+
+  { n:33, titre:"Le Maître Enseignant",
+    msg:"Le 33 est le plus haut des nombres maîtres. Il porte la vibration la plus élevée de la compassion et du service désintéressé. Ceux qui le portent ont une mission de lumière — guérir, élever, enseigner non pas par les mots mais par ce qu'ils sont dans leur façon d'être au monde. C'est un nombre rare et profondément beau.",
+    lumiere:"Amour universel, guidance spirituelle, compassion totale, capacité à guérir et à élever.",
+    ombre:"Sacrifice destructeur, surcharge émotionnelle, impossibilité à décevoir, oubli de soi.",
+    vigilance:"Tu es ici pour servir la lumière — mais pas au prix de t'éteindre. Prendre soin de toi est aussi sacré que prendre soin des autres." }
+];
+
+// ══════════════════════════════════════════════════════════
+// SYMBOLES SACRÉS — 1 géométrie par carte
+// Même rendu que carte_3_triangle :
+//   - triple trait (ombre + corps + cœur)
+//   - cercle guide en pointillés
+//   - points aux sommets
+//   - centroïde
+// cx=125 cy=188 R=58 (cercle circonscrit)
+// ══════════════════════════════════════════════════════════
+function r(deg){ return deg*Math.PI/180; }
+
+// Triple trait sur un path
+function tripleStroke(el){
+  return `${el.replace('__SW__','6').replace('__COL__','rgba(60,30,5,0.55)').replace('__OP__','1')}
+          ${el.replace('__SW__','3.6').replace('__COL__','#c9a84c').replace('__OP__','1')}
+          ${el.replace('__SW__','1.2').replace('__COL__','#f5e098').replace('__OP__','1')}`;
+}
+
+// Polygone régulier — retourne les points
+function polyPts(cx,cy,rr,n,rot=0){
+  let pts=[];
+  for(let i=0;i<n;i++){const a=r(-90+rot+i*(360/n));pts.push([cx+rr*Math.cos(a),cy+rr*Math.sin(a)]);}
+  return pts;
+}
+
+// Cercle guide pointillé
+function guideCircle(cx,cy,rr){
+  return `<circle cx="${cx}" cy="${cy}" r="${rr}" fill="none" stroke="rgba(201,168,76,0.15)" stroke-width="0.6" stroke-dasharray="2 4"/>`;
+}
+// Cercle inscrit pointillé
+function inscrCircle(cx,cy,rr){
+  return `<circle cx="${cx}" cy="${cy}" r="${rr}" fill="none" stroke="rgba(201,168,76,0.18)" stroke-width="0.6" stroke-dasharray="1.5 3"/>`;
+}
+// Points sommets
+function dotPts(pts){
+  return pts.map(([x,y])=>`<circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="2.2" fill="#f5e098" opacity="0.88"/>`).join('');
+}
+// Centroïde
+function centroid(cx,cy){
+  return `<circle cx="${cx}" cy="${cy}" r="1.8" fill="#f5e098" opacity="0.90"/>`;
+}
+
+// Triple polygone
+function triPoly(pts, extra=''){
+  const pStr = pts.map(([x,y])=>`${x.toFixed(2)},${y.toFixed(2)}`).join(' ');
+  return `<polygon points="${pStr}" fill="none" stroke="rgba(60,30,5,0.55)" stroke-width="6" stroke-linejoin="round"/>
+          <polygon points="${pStr}" fill="none" stroke="#c9a84c" stroke-width="3.6" stroke-linejoin="round"/>
+          <polygon points="${pStr}" fill="none" stroke="#f5e098" stroke-width="1.2" stroke-linejoin="round"/>${extra}`;
+}
+
+// Triple path
+function triPath(d){
+  return `<path d="${d}" fill="none" stroke="rgba(60,30,5,0.55)" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+          <path d="${d}" fill="none" stroke="#c9a84c" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round"/>
+          <path d="${d}" fill="none" stroke="#f5e098" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>`;
+}
+
+function buildSymbol(n){
+  const cx=125, cy=188, R=58;
+  let svg='';
+  switch(n){
+    case 0: { // Cercles concentriques — le vide infini
+      svg = guideCircle(cx,cy,R)
+          + `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="rgba(60,30,5,0.55)" stroke-width="6"/>
+             <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#c9a84c" stroke-width="3.6"/>
+             <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#f5e098" stroke-width="1.2"/>`
+          + inscrCircle(cx,cy,R*0.58)
+          + inscrCircle(cx,cy,R*0.28)
+          + centroid(cx,cy);
+      break; }
+    case 1: { // Ligne verticale — le premier élan
+      svg = guideCircle(cx,cy,R)
+          + triPath(`M${cx},${cy-R} L${cx},${cy+R}`)
+          + `<circle cx="${cx}" cy="${cy-R}" r="2.2" fill="#f5e098" opacity="0.88"/>
+             <circle cx="${cx}" cy="${cy+R}" r="2.2" fill="#f5e098" opacity="0.88"/>`
+          + centroid(cx,cy);
+      break; }
+    case 2: { // Vésica Piscis — l'alliance
+      const d = R;
+      svg = guideCircle(cx,cy,R)
+          + `<circle cx="${cx-d/2}" cy="${cy}" r="${d}" fill="none" stroke="rgba(60,30,5,0.45)" stroke-width="5"/>
+             <circle cx="${cx+d/2}" cy="${cy}" r="${d}" fill="none" stroke="rgba(60,30,5,0.45)" stroke-width="5"/>
+             <circle cx="${cx-d/2}" cy="${cy}" r="${d}" fill="none" stroke="#c9a84c" stroke-width="3.2"/>
+             <circle cx="${cx+d/2}" cy="${cy}" r="${d}" fill="none" stroke="#c9a84c" stroke-width="3.2"/>
+             <circle cx="${cx-d/2}" cy="${cy}" r="${d}" fill="none" stroke="#f5e098" stroke-width="1.1"/>
+             <circle cx="${cx+d/2}" cy="${cy}" r="${d}" fill="none" stroke="#f5e098" stroke-width="1.1"/>`
+          + centroid(cx,cy);
+      break; }
+    case 3: { // Triangle équilatéral — la trinité
+      const p3 = polyPts(cx,cy,R,3);
+      svg = guideCircle(cx,cy,R) + triPoly(p3) + inscrCircle(cx,cy,R/2) + dotPts(p3) + centroid(cx,cy);
+      break; }
+    case 4: { // Carré — la fondation
+      const p4 = polyPts(cx,cy,R,4,45);
+      svg = guideCircle(cx,cy,R) + triPoly(p4) + inscrCircle(cx,cy,R*0.7) + dotPts(p4) + centroid(cx,cy);
+      break; }
+    case 5: { // Pentagone — la liberté
+      const p5 = polyPts(cx,cy,R,5);
+      svg = guideCircle(cx,cy,R) + triPoly(p5) + inscrCircle(cx,cy,R*0.68) + dotPts(p5) + centroid(cx,cy);
+      break; }
+    case 6: { // Étoile de David — l'harmonie
+      const p6a = polyPts(cx,cy,R,3);
+      const p6b = polyPts(cx,cy,R,3,180);
+      svg = guideCircle(cx,cy,R) + triPoly(p6a) + triPoly(p6b)
+          + inscrCircle(cx,cy,R*0.5)
+          + dotPts(p6a) + dotPts(p6b) + centroid(cx,cy);
+      break; }
+    case 7: { // Heptagone — la quête
+      const p7 = polyPts(cx,cy,R,7);
+      svg = guideCircle(cx,cy,R) + triPoly(p7) + inscrCircle(cx,cy,R*0.7) + dotPts(p7) + centroid(cx,cy);
+      break; }
+    case 8: { // Octogone — la puissance
+      const p8 = polyPts(cx,cy,R,8);
+      svg = guideCircle(cx,cy,R) + triPoly(p8) + inscrCircle(cx,cy,R*0.72) + dotPts(p8) + centroid(cx,cy);
+      break; }
+    case 9: { // Ennéagone — l'achèvement
+      const p9 = polyPts(cx,cy,R,9);
+      svg = guideCircle(cx,cy,R) + triPoly(p9) + inscrCircle(cx,cy,R*0.75) + dotPts(p9) + centroid(cx,cy);
+      break; }
+    case 10: { // Cercle + triangle — renouveau
+      const p10 = polyPts(cx,cy,R*0.7,3);
+      svg = guideCircle(cx,cy,R)
+          + `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="rgba(60,30,5,0.55)" stroke-width="6"/>
+             <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#c9a84c" stroke-width="3.6"/>
+             <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#f5e098" stroke-width="1.2"/>`
+          + triPoly(p10) + dotPts(p10) + centroid(cx,cy);
+      break; }
+    case 11: { // Deux lignes parallèles — nombre maître
+      svg = guideCircle(cx,cy,R)
+          + triPath(`M${cx-18},${cy-R} L${cx-18},${cy+R}`)
+          + triPath(`M${cx+18},${cy-R} L${cx+18},${cy+R}`)
+          + `<circle cx="${cx-18}" cy="${cy-R}" r="2.2" fill="#f5e098" opacity="0.88"/>
+             <circle cx="${cx-18}" cy="${cy+R}" r="2.2" fill="#f5e098" opacity="0.88"/>
+             <circle cx="${cx+18}" cy="${cy-R}" r="2.2" fill="#f5e098" opacity="0.88"/>
+             <circle cx="${cx+18}" cy="${cy+R}" r="2.2" fill="#f5e098" opacity="0.88"/>`
+          + centroid(cx,cy);
+      break; }
+    case 12: { // Dodécagone — cycles
+      const p12 = polyPts(cx,cy,R,12);
+      svg = guideCircle(cx,cy,R) + triPoly(p12) + inscrCircle(cx,cy,R*0.8) + dotPts(p12) + centroid(cx,cy);
+      break; }
+    case 13: { // Triangle inversé + cercle — transformation
+      const p13 = polyPts(cx,cy,R,3,180);
+      svg = guideCircle(cx,cy,R) + triPoly(p13)
+          + `<circle cx="${cx}" cy="${cy}" r="${R*0.5}" fill="none" stroke="#c9a84c" stroke-width="1.8"/>
+             <circle cx="${cx}" cy="${cy}" r="${R*0.5}" fill="none" stroke="#f5e098" stroke-width="0.7"/>`
+          + dotPts(p13) + centroid(cx,cy);
+      break; }
+    case 14: { // Rectangle vertical — tempérance
+      const rw=R*0.9, rh=R*1.4;
+      svg = guideCircle(cx,cy,R)
+          + `<rect x="${cx-rw/2}" y="${cy-rh/2}" width="${rw}" height="${rh}" fill="none" stroke="rgba(60,30,5,0.55)" stroke-width="6" stroke-linejoin="round"/>
+             <rect x="${cx-rw/2}" y="${cy-rh/2}" width="${rw}" height="${rh}" fill="none" stroke="#c9a84c" stroke-width="3.6" stroke-linejoin="round"/>
+             <rect x="${cx-rw/2}" y="${cy-rh/2}" width="${rw}" height="${rh}" fill="none" stroke="#f5e098" stroke-width="1.2" stroke-linejoin="round"/>`
+          + inscrCircle(cx,cy,R*0.45)
+          + `<circle cx="${cx-rw/2}" cy="${cy-rh/2}" r="2.2" fill="#f5e098" opacity="0.88"/>
+             <circle cx="${cx+rw/2}" cy="${cy-rh/2}" r="2.2" fill="#f5e098" opacity="0.88"/>
+             <circle cx="${cx-rw/2}" cy="${cy+rh/2}" r="2.2" fill="#f5e098" opacity="0.88"/>
+             <circle cx="${cx+rw/2}" cy="${cy+rh/2}" r="2.2" fill="#f5e098" opacity="0.88"/>`
+          + centroid(cx,cy);
+      break; }
+    case 15: { // Pentagone + étoile intérieure — attachement
+      const p15 = polyPts(cx,cy,R,5);
+      const p15i = polyPts(cx,cy,R*0.55,5);
+      const star5d = [0,2,4,1,3,0].map((i,idx)=>(idx===0?'M':'L')+p15i[i][0].toFixed(2)+','+p15i[i][1].toFixed(2)).join(' ')+'Z';
+      svg = guideCircle(cx,cy,R) + triPoly(p15)
+          + `<path d="${star5d}" fill="none" stroke="#c9a84c" stroke-width="1.4"/>
+             <path d="${star5d}" fill="none" stroke="#f5e098" stroke-width="0.5"/>`
+          + dotPts(p15) + centroid(cx,cy);
+      break; }
+    case 16: { // Éclair — la révélation
+      const lx=cx, ly=cy;
+      const ld=`M${lx+10},${ly-R} L${lx-12},${ly-2} L${lx+7},${ly-2} L${lx-10},${ly+R}`;
+      svg = guideCircle(cx,cy,R) + triPath(ld)
+          + `<circle cx="${lx+10}" cy="${ly-R}" r="2.2" fill="#f5e098" opacity="0.88"/>
+             <circle cx="${lx-10}" cy="${ly+R}" r="2.2" fill="#f5e098" opacity="0.88"/>`;
+      break; }
+    case 17: { // Étoile à 8 branches — l'étoile
+      const r8=R, ri=R*0.42;
+      let d8='';
+      for(let i=0;i<8;i++){
+        const a1=r(-90+i*45),a2=r(-90+i*45+22.5);
+        d8+=(i===0?'M':'L')+`${(cx+r8*Math.cos(a1)).toFixed(2)},${(cy+r8*Math.sin(a1)).toFixed(2)} L${(cx+ri*Math.cos(a2)).toFixed(2)},${(cy+ri*Math.sin(a2)).toFixed(2)} `;
+      }
+      d8+='Z';
+      svg = guideCircle(cx,cy,R) + triPath(d8) + centroid(cx,cy);
+      break; }
+    case 18: { // Croissant + cercle — l'illusion
+      svg = guideCircle(cx,cy,R)
+          + `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="rgba(60,30,5,0.55)" stroke-width="6"/>
+             <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#c9a84c" stroke-width="3.6"/>
+             <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#f5e098" stroke-width="1.2"/>
+             <circle cx="${cx+R*0.38}" cy="${cy}" r="${R}" fill="none" stroke="rgba(60,30,5,0.55)" stroke-width="6"/>
+             <circle cx="${cx+R*0.38}" cy="${cy}" r="${R}" fill="none" stroke="#c9a84c" stroke-width="3.6"/>
+             <circle cx="${cx+R*0.38}" cy="${cy}" r="${R}" fill="none" stroke="#f5e098" stroke-width="1.2"/>`
+          + centroid(cx,cy);
+      break; }
+    case 19: { // Soleil — rayons
+      let rays='';
+      for(let i=0;i<12;i++){
+        const a=r(i*30);
+        const x1=cx+(R*0.45)*Math.cos(a), y1=cy+(R*0.45)*Math.sin(a);
+        const x2=cx+R*Math.cos(a), y2=cy+R*Math.sin(a);
+        rays+=`<line x1="${x1.toFixed(2)}" y1="${y1.toFixed(2)}" x2="${x2.toFixed(2)}" y2="${y2.toFixed(2)}" stroke="rgba(60,30,5,0.55)" stroke-width="5"/>
+               <line x1="${x1.toFixed(2)}" y1="${y1.toFixed(2)}" x2="${x2.toFixed(2)}" y2="${y2.toFixed(2)}" stroke="#c9a84c" stroke-width="2.8"/>
+               <line x1="${x1.toFixed(2)}" y1="${y1.toFixed(2)}" x2="${x2.toFixed(2)}" y2="${y2.toFixed(2)}" stroke="#f5e098" stroke-width="1.0"/>`;
+      }
+      svg = guideCircle(cx,cy,R) + rays
+          + `<circle cx="${cx}" cy="${cy}" r="${R*0.4}" fill="none" stroke="rgba(60,30,5,0.55)" stroke-width="6"/>
+             <circle cx="${cx}" cy="${cy}" r="${R*0.4}" fill="none" stroke="#c9a84c" stroke-width="3.6"/>
+             <circle cx="${cx}" cy="${cy}" r="${R*0.4}" fill="none" stroke="#f5e098" stroke-width="1.2"/>`
+          + centroid(cx,cy);
+      break; }
+    case 20: { // Hexagone + triangle — l'éveil
+      const p20h = polyPts(cx,cy,R,6);
+      const p20t = polyPts(cx,cy,R*0.6,3);
+      svg = guideCircle(cx,cy,R) + triPoly(p20h) + triPoly(p20t)
+          + dotPts(p20h) + centroid(cx,cy);
+      break; }
+    case 21: { // Heptagone double — l'accomplissement
+      const p21a = polyPts(cx,cy,R,7);
+      const p21b = polyPts(cx,cy,R*0.58,7,25.7);
+      svg = guideCircle(cx,cy,R) + triPoly(p21a) + triPoly(p21b)
+          + dotPts(p21a) + centroid(cx,cy);
+      break; }
+    case 22: { // Carrés imbriqués — le maître bâtisseur
+      const sq = (rr,rot=0) => {
+        const pts=polyPts(cx,cy,rr,4,rot);
+        return triPoly(pts);
+      };
+      svg = guideCircle(cx,cy,R) + sq(R,45) + sq(R*0.7,0) + sq(R*0.42,45)
+          + centroid(cx,cy);
+      break; }
+    case 23: { // Octogone — la grâce
+      const p23 = polyPts(cx,cy,R,8,22.5);
+      svg = guideCircle(cx,cy,R) + triPoly(p23) + inscrCircle(cx,cy,R*0.75)
+          + dotPts(p23) + centroid(cx,cy);
+      break; }
+    case 24: { // Double triangle + cercle — amour actif
+      const p24a = polyPts(cx,cy,R,3);
+      const p24b = polyPts(cx,cy,R,3,180);
+      const p24c = polyPts(cx,cy,R*0.5,3);
+      svg = guideCircle(cx,cy,R) + triPoly(p24a) + triPoly(p24b) + triPoly(p24c)
+          + dotPts(p24a) + centroid(cx,cy);
+      break; }
+    case 25: { // Décagone — sagesse intuitive
+      const p25 = polyPts(cx,cy,R,10);
+      svg = guideCircle(cx,cy,R) + triPoly(p25) + inscrCircle(cx,cy,R*0.77)
+          + dotPts(p25) + centroid(cx,cy);
+      break; }
+    case 26: { // Carré + hexagone — pouvoir ancré
+      const p26h = polyPts(cx,cy,R*0.7,6);
+      const p26s = polyPts(cx,cy,R,4,45);
+      svg = guideCircle(cx,cy,R) + triPoly(p26s) + triPoly(p26h)
+          + dotPts(p26s) + centroid(cx,cy);
+      break; }
+    case 27: { // Ennéagone double — l'inspiration
+      const p27a = polyPts(cx,cy,R,9,-10);
+      const p27b = polyPts(cx,cy,R*0.58,9,10);
+      svg = guideCircle(cx,cy,R) + triPoly(p27a) + triPoly(p27b)
+          + dotPts(p27a) + centroid(cx,cy);
+      break; }
+    case 28: { // Étoile 8 + cercle — chef solitaire
+      const r28=R, ri28=R*0.4;
+      let d28='';
+      for(let i=0;i<8;i++){
+        const a1=r(-90+i*45),a2=r(-90+i*45+22.5);
+        d28+=(i===0?'M':'L')+`${(cx+r28*Math.cos(a1)).toFixed(2)},${(cy+r28*Math.sin(a1)).toFixed(2)} L${(cx+ri28*Math.cos(a2)).toFixed(2)},${(cy+ri28*Math.sin(a2)).toFixed(2)} `;
+      }
+      d28+='Z';
+      svg = guideCircle(cx,cy,R) + triPath(d28) + inscrCircle(cx,cy,R*0.38) + centroid(cx,cy);
+      break; }
+    case 29: { // Hendécagone — l'épreuve
+      const p29 = polyPts(cx,cy,R,11);
+      svg = guideCircle(cx,cy,R) + triPoly(p29) + inscrCircle(cx,cy,R*0.79)
+          + dotPts(p29) + centroid(cx,cy);
+      break; }
+    case 30: { // Fleur de vie — créativité pure
+      const rf=R*0.38;
+      const centers=[[0,0]];
+      for(let i=0;i<6;i++){const a=r(i*60);centers.push([rf*2*Math.cos(a),rf*2*Math.sin(a)]);}
+      let petals='';
+      centers.forEach(([dx,dy])=>{
+        petals+=`<circle cx="${(cx+dx).toFixed(2)}" cy="${(cy+dy).toFixed(2)}" r="${rf}" fill="none" stroke="rgba(60,30,5,0.4)" stroke-width="5"/>
+                 <circle cx="${(cx+dx).toFixed(2)}" cy="${(cy+dy).toFixed(2)}" r="${rf}" fill="none" stroke="#c9a84c" stroke-width="3"/>
+                 <circle cx="${(cx+dx).toFixed(2)}" cy="${(cy+dy).toFixed(2)}" r="${rf}" fill="none" stroke="#f5e098" stroke-width="1.1"/>`;
+      });
+      svg = guideCircle(cx,cy,R) + petals
+          + `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="rgba(201,168,76,0.2)" stroke-width="0.8"/>`
+          + centroid(cx,cy);
+      break; }
+    case 31: { // Dodécagone + carré — création ancrée
+      const p31 = polyPts(cx,cy,R,12,15);
+      const p31s = polyPts(cx,cy,R*0.52,4,45);
+      svg = guideCircle(cx,cy,R) + triPoly(p31) + triPoly(p31s)
+          + dotPts(p31) + centroid(cx,cy);
+      break; }
+    case 32: { // Cube de Métatron — la parole sacrée
+      const rm=R*0.36;
+      const pos32=[[0,0]];
+      for(let i=0;i<6;i++){const a=r(i*60);pos32.push([rm*2*Math.cos(a),rm*2*Math.sin(a)]);}
+      let lines32='',circles32='';
+      for(let i=0;i<pos32.length;i++)for(let j=i+1;j<pos32.length;j++){
+        lines32+=`<line x1="${(cx+pos32[i][0]).toFixed(2)}" y1="${(cy+pos32[i][1]).toFixed(2)}" x2="${(cx+pos32[j][0]).toFixed(2)}" y2="${(cy+pos32[j][1]).toFixed(2)}" stroke="rgba(201,168,76,0.18)" stroke-width="0.5"/>`;
+      }
+      pos32.forEach(([dx,dy])=>{
+        circles32+=`<circle cx="${(cx+dx).toFixed(2)}" cy="${(cy+dy).toFixed(2)}" r="${rm}" fill="none" stroke="rgba(60,30,5,0.4)" stroke-width="4"/>
+                    <circle cx="${(cx+dx).toFixed(2)}" cy="${(cy+dy).toFixed(2)}" r="${rm}" fill="none" stroke="#c9a84c" stroke-width="2.6"/>
+                    <circle cx="${(cx+dx).toFixed(2)}" cy="${(cy+dy).toFixed(2)}" r="${rm}" fill="none" stroke="#f5e098" stroke-width="0.9"/>`;
+      });
+      svg = guideCircle(cx,cy,R) + lines32 + circles32 + centroid(cx,cy);
+      break; }
+    case 33: { // Hexagone triple + centre — maître enseignant
+      const p33a = polyPts(cx,cy,R,6);
+      const p33b = polyPts(cx,cy,R*0.68,6,30);
+      const p33c = polyPts(cx,cy,R*0.38,6);
+      svg = guideCircle(cx,cy,R) + triPoly(p33a) + triPoly(p33b) + triPoly(p33c)
+          + dotPts(p33a)
+          + `<circle cx="${cx}" cy="${cy}" r="5" fill="#f5e098" opacity="0.3"/>`
+          + centroid(cx,cy);
+      break; }
+    default:
+      svg = guideCircle(cx,cy,R)
+          + `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#c9a84c" stroke-width="3.6"/>`;
+  }
+  return svg;
+}
+
+// ══════════════════════════════════════════════════════════
+// GÉNÈRE LE SVG COMPLET D'UNE CARTE (250×375)
+// Identique à carte_3_triangle.html
+// Losanges positionnés dynamiquement selon la largeur du texte
+// ══════════════════════════════════════════════════════════
+function buildCardSVG(carte, isDos=false){
+  const CX=125, CY=188;
+
+  // Calcul de la largeur approximative du texte du titre
+  // Police Georgia 10px, letter-spacing 2.5px
+  // Approximation : chaque caractère ~6px + spacing
+  const titre = isDos ? 'ORACLE' : carte.titre.toUpperCase();
+  const charW = 5.8;
+  const spacing = 2.5;
+  const textW = titre.length * charW + (titre.length - 1) * spacing;
+  const gap = 8; // espace entre texte et losange
+  const lozW = 2.5; // demi-diagonale losange
+
+  const lozLx = 125 - textW/2 - gap - lozW;
+  const lozRx = 125 + textW/2 + gap + lozW;
+  const lozY  = 327;
+
+  const numStr = isDos ? '' : String(carte.n);
+
+  let symbolContent = isDos
+    ? `<!-- Fleur de vie dos -->
+       <g fill="none">
+         ${buildSymbol(30) /* fleur de vie = carte 30 */}
+       </g>`
+    : `<g fill="none">${buildSymbol(carte.n)}</g>`;
+
+  return `<svg width="250" height="375" viewBox="0 0 250 375" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <linearGradient id="bg" x1="20%" y1="0%" x2="80%" y2="100%">
+    <stop offset="0%"   stop-color="#040d28"/>
+    <stop offset="35%"  stop-color="#091a52"/>
+    <stop offset="65%"  stop-color="#0c2068"/>
+    <stop offset="100%" stop-color="#050b20"/>
+  </linearGradient>
+  <linearGradient id="gd" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%"   stop-color="#f5e098"/>
+    <stop offset="45%"  stop-color="#c9a84c"/>
+    <stop offset="100%" stop-color="#7a4e18"/>
+  </linearGradient>
+  <linearGradient id="gdH" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%"   stop-color="#f5e098"/>
+    <stop offset="50%"  stop-color="#c9a84c"/>
+    <stop offset="100%" stop-color="#7a4e18"/>
+  </linearGradient>
+  <radialGradient id="cg" cx="50%" cy="50%" r="50%">
+    <stop offset="0%"   stop-color="rgba(190,150,60,0.12)"/>
+    <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+  </radialGradient>
+  <clipPath id="cl"><rect width="250" height="375" rx="12" ry="12"/></clipPath>
+</defs>
+<g clip-path="url(#cl)">
+  <rect width="250" height="375" fill="url(#bg)"/>
+  <rect width="250" height="375" fill="url(#cg)"/>
+
+  ${symbolContent}
+
+  <!-- LOGO -->
+  <text x="125" y="36" text-anchor="middle"
+    font-family="'Cinzel Decorative',serif"
+    font-size="13" fill="url(#gd)" opacity="0.90" letter-spacing="0.5">Illumin&amp;Son</text>
+  <line x1="82" y1="43" x2="168" y2="43" stroke="url(#gdH)" stroke-width="0.5" opacity="0.32"/>
+
+  <!-- NOM DU SYMBOLE + LOSANGES -->
+  <polygon points="${lozLx},${lozY-2.5} ${lozLx+2.5},${lozY} ${lozLx},${lozY+2.5} ${lozLx-2.5},${lozY}"
+    fill="#c9a84c" opacity="0.80"/>
+  <text x="125" y="330" text-anchor="middle"
+    font-family="Georgia,serif"
+    font-size="10" fill="#f0d080" opacity="0.85" letter-spacing="2.5">${titre}</text>
+  <polygon points="${lozRx},${lozY-2.5} ${lozRx+2.5},${lozY} ${lozRx},${lozY+2.5} ${lozRx-2.5},${lozY}"
+    fill="#c9a84c" opacity="0.80"/>
+
+  <!-- NUMÉRO -->
+  <text x="125" y="352" text-anchor="middle"
+    font-family="'Cormorant Garamond',serif"
+    font-size="13" font-weight="700" fill="url(#gd)" opacity="0.92" letter-spacing="4">${numStr}</text>
+
+  <!-- LISERÉ EXTÉRIEUR -->
+  <rect x="0.75" y="0.75" width="248.5" height="373.5" rx="11.5" ry="11.5"
+        fill="none" stroke="url(#gd)" stroke-width="1.5" opacity="0.28"/>
+  <!-- LISERÉ INTÉRIEUR -->
+  <rect x="11" y="11" width="228" height="353" rx="7" ry="7"
+        fill="none" stroke="url(#gd)" stroke-width="1.2" opacity="0.78"/>
+  <!-- ÉQUERRES -->
+  <polyline points="16,28 16,16 28,16" fill="none" stroke="url(#gd)" stroke-width="1.3" stroke-linecap="square" opacity="0.88"/>
+  <rect x="18" y="18" width="5" height="5" fill="none" stroke="url(#gd)" stroke-width="0.8" opacity="0.65"/>
+  <polyline points="234,28 234,16 222,16" fill="none" stroke="url(#gd)" stroke-width="1.3" stroke-linecap="square" opacity="0.88"/>
+  <rect x="227" y="18" width="5" height="5" fill="none" stroke="url(#gd)" stroke-width="0.8" opacity="0.65"/>
+  <polyline points="16,348 16,360 28,360" fill="none" stroke="url(#gd)" stroke-width="1.3" stroke-linecap="square" opacity="0.88"/>
+  <rect x="18" y="351" width="5" height="5" fill="none" stroke="url(#gd)" stroke-width="0.8" opacity="0.65"/>
+  <polyline points="234,348 234,360 222,360" fill="none" stroke="url(#gd)" stroke-width="1.3" stroke-linecap="square" opacity="0.88"/>
+  <rect x="227" y="351" width="5" height="5" fill="none" stroke="url(#gd)" stroke-width="0.8" opacity="0.65"/>
+</g>
+</svg>`;
+}
+
+// ══════════════════════════════════════
+// TIRAGE 1 PAR JOUR
+// ══════════════════════════════════════
+// ── Formate la date en français long ──
+function formatDateFR(){
+  const jours = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  const mois  = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  const d = new Date();
+  return `${jours[d.getDay()]} ${d.getDate()} ${mois[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function getToday(){ return new Date().toISOString().slice(0,10); }
+
+function resetDraw(){
+  localStorage.removeItem('illuminson_oracle_v2');
+  location.reload();
+}
+
+function showResetBtn(){
+  const btn = document.getElementById('btnReset');
+  btn.style.removeProperty('display');
+  btn.style.display = 'block';
+}
+
+function getStoredDraw(){
+  try{
+    const raw=localStorage.getItem('illuminson_oracle_v2');
+    if(!raw) return null;
+    const obj=JSON.parse(raw);
+    if(obj.date!==getToday()) return null;
+    return obj;
+  }catch(e){ return null; }
+}
+function storeDraw(n){ localStorage.setItem('illuminson_oracle_v2',JSON.stringify({date:getToday(),n})); }
+
+// ══════════════════════════════════════
+// SPARKS
+// ══════════════════════════════════════
+function spawnSpark(){
+  const scene=document.getElementById('scene');
+  const stage=document.getElementById('cardStage');
+  const sr=stage.getBoundingClientRect(), scr=scene.getBoundingClientRect();
+  const s=document.createElement('div'); s.className='spark';
+  const sz=2+Math.random()*4;
+  s.style.width=s.style.height=sz+'px';
+  s.style.left=(sr.left-scr.left+Math.random()*sr.width)+'px';
+  s.style.top=(sr.top-scr.top+Math.random()*sr.height)+'px';
+  s.style.background=Math.random()>0.4?'#f0d080':'#c9a84c';
+  scene.appendChild(s);
+  const rise=-60-Math.random()*80, drift=(Math.random()-0.5)*40, dur=900+Math.random()*700;
+  s.animate([
+    {opacity:0,transform:'translate(0,0) scale(0.3)'},
+    {opacity:0.9,transform:`translate(${drift*.3}px,${rise*.3}px) scale(1)`,offset:0.2},
+    {opacity:0.4,transform:`translate(${drift}px,${rise}px) scale(0.6)`,offset:0.8},
+    {opacity:0,transform:`translate(${drift*1.1}px,${rise*1.2}px) scale(0)`}
+  ],{duration:dur,easing:'ease-out'});
+  setTimeout(()=>s.remove(),dur);
+}
+
+// ══════════════════════════════════════
+// EASING
+// ══════════════════════════════════════
+function customEase(t){
+  if(t<0.55){const t2=t/0.55;return 0.55*(t2*t2*(3-2*t2))*0.72;}
+  else{const t2=(t-0.55)/0.45;const e=1-Math.pow(1-t2,5);return 0.395+e*0.605;}
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  // Injecter le dos de la carte (fleur de vie)
+  document.getElementById('cardBack').innerHTML = buildCardSVG(null, true);
+
+  const stored=getStoredDraw();
+  if(stored!==null){
+    showAlreadyDrawn(stored.n);
+  } else {
+    document.getElementById('btnReveal').addEventListener('click',startSequence);
+  }
+});
+
+function showAlreadyDrawn(n){
+  const c=CARTES[n];
+  // Injecter la face tirée dans la carte existante et la retourner
+  document.getElementById('cardFront').innerHTML = buildCardSVG(c, false);
+  document.getElementById('cardSpin').style.transform = 'rotateY(180deg)';
+  document.getElementById('btnReveal').style.display='none';
+  document.getElementById('etherText').style.display='none';
+  const scene=document.getElementById('scene');
+  const box=document.createElement('div');
+  box.className='already-box';
+  box.innerHTML=`
+    <div class="already-title">Ta carte du jour</div>
+    <div class="already-text">${c.msg}</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+      <div class="panel lumiere" style="flex:1;min-width:120px;border-radius:8px;padding:10px 13px;font-size:13px;line-height:1.55;">
+        <span class="panel-label">✦ Lumière</span>${c.lumiere}</div>
+      <div class="panel ombre" style="flex:1;min-width:120px;border-radius:8px;padding:10px 13px;font-size:13px;line-height:1.55;">
+        <span class="panel-label">◆ Ombre</span>${c.ombre}</div>
+    </div>
+    <div class="panel vigilance" style="border-radius:8px;padding:10px 13px;font-size:13px;line-height:1.55;margin-bottom:14px;">
+      <span class="panel-label">⚠ Vigilance</span>${c.vigilance}</div>
+    <div class="tomorrow-text" style="margin-bottom:14px;">Reviens demain pour un nouveau tirage 🌙</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:rgba(180,140,60,0.35);line-height:1.7;margin-bottom:16px;">Cet oracle est un outil de réflexion et d'inspiration personnelle. Il ne prétend pas détenir la vérité sur ta vie, tes choix ou ton avenir. Seul·e toi sais ce qui est juste pour toi. Si tu le souhaites, tu peux accueillir ce message comme une invitation à regarder en toi — non comme une certitude.</div>
+    <a class="btn-rdv" href="https://www.sumupbookings.com/illumin-son" target="_blank" rel="noopener" style="margin-bottom:10px;">✦ &nbsp;Prendre rendez-vous&nbsp; ✦</a>
+    <a class="btn-contact" href="https://www.linktree.com/illumineson" target="_blank" rel="noopener">Nous contacter</a>`;
+  scene.appendChild(box);
+  showResetBtn();
+}
+
+let started=false;
+function startSequence(){
+  if(started) return;
+  started=true;
+
+  // Masquer le disclaimer d'accueil
+  const da = document.getElementById('disclaimerAccueil');
+  if(da) da.style.display='none';
+
+  document.getElementById('btnReveal').style.display='none';
+  const etherText=document.getElementById('etherText');
+  const card=document.getElementById('cardSpin');
+  const glow=document.getElementById('cardGlow');
+
+  etherText.classList.add('visible');
+  setTimeout(()=>{
+    etherText.classList.remove('visible');
+    const totalDuration=5000, totalRotation=5*360+180;
+    const startTime=performance.now();
+    let lastSpark=0;
+    let cardRevealed=false; // tirage fait au moment du retournement
+
+    function frame(now){
+      const elapsed=now-startTime, t=Math.min(elapsed/totalDuration,1);
+      const angle=customEase(t)*totalRotation;
+      card.style.transform=`rotateY(${angle}deg)`;
+      const gi=t<0.55?0.7:(1-(t-0.55)/0.45)*0.7;
+      glow.style.opacity=gi;
+      glow.style.boxShadow=`0 0 ${30+gi*40}px rgba(201,168,76,${gi*0.6})`;
+      const sf=t<0.55?110:110+((t-0.55)/0.45)*500;
+      if(now-lastSpark>sf&&t<0.96){spawnSpark();lastSpark=now;}
+
+      // Tirer la carte et injecter le SVG quand la carte est de profil
+      // pendant le retournement final : angle ≈ 1890° (5 tours = 1800° + 90°)
+      if(!cardRevealed && angle>=1890){
+        cardRevealed=true;
+        const n=Math.floor(Math.random()*34);
+        storeDraw(n);
+        const c=CARTES[n];
+        document.getElementById('cardFront').innerHTML = buildCardSVG(c, false);
+        card._carteData = c;
+      }
+
+      if(t<1){ requestAnimationFrame(frame); }
+      else {
+        card.style.transform='rotateY(180deg)';
+        glow.style.opacity='0';
+        for(let i=0;i<16;i++) setTimeout(spawnSpark,i*55);
+        const c = card._carteData;
+        setTimeout(()=>{
+          document.getElementById('msgText').textContent=c.msg;
+          document.getElementById('panLumiere').textContent=c.lumiere;
+          document.getElementById('panOmbre').textContent=c.ombre;
+          document.getElementById('panVigilance').textContent=c.vigilance;
+          // Date + titre
+          document.getElementById('cardDate').textContent=formatDateFR();
+          document.getElementById('cardDate').classList.add('show');
+          document.getElementById('cardTitre').textContent=`${c.n} — ${c.titre}`;
+          document.getElementById('cardTitre').classList.add('show');
+          document.getElementById('msgBox').classList.add('show');
+          document.getElementById('panels').classList.add('show');
+          document.getElementById('ctaRow').classList.add('show');
+          document.getElementById('tomorrowBox').classList.add('show');
+          document.getElementById('disclaimerBox').classList.add('show');
+          showResetBtn();
+        },800);
+      }
+    }
+    requestAnimationFrame(frame);
+  },1000);
+}
+
+// ══════════════════════════════════════
+// PARTAGE
+// ══════════════════════════════════════
+async function partagerCarte(){
+  const btn = document.getElementById('btnShare');
+  btn.textContent = '… génération en cours …';
+  btn.disabled = true;
+
+  const stored = getStoredDraw();
+  if(!stored){ btn.textContent='✦ Partager ma carte du jour ✦'; btn.disabled=false; return; }
+  const c = CARTES[stored.n];
+  const dateFR = formatDateFR();
+
+  // Récupérer le SVG de la carte tirée
+  const cardFrontEl = document.getElementById('cardFront');
+  const cardSvgHTML = cardFrontEl ? cardFrontEl.innerHTML : '';
+
+  // Construire la zone de capture
+  const zone = document.getElementById('shareCanvas');
+  zone.innerHTML = `
+    <div class="sh-logo">Illumin&amp;Son</div>
+    <div class="sh-sub">Oracle du Jour</div>
+    <div class="sh-card">${cardSvgHTML}</div>
+    <div class="sh-date">${dateFR}</div>
+    <div class="sh-titre">${c.n} — ${c.titre.toUpperCase()}</div>
+    <div class="sh-msg">${c.msg}</div>
+  `;
+
+  await document.fonts.ready;
+
+  try {
+    const canvas = await html2canvas(zone, {
+      backgroundColor:'#04080f',
+      scale:2,
+      useCORS:true,
+      logging:false,
+      windowWidth:420
+    });
+
+    const dataUrl = canvas.toDataURL('image/png');
+
+    // Partage natif mobile en priorité
+    if(navigator.share){
+      try {
+        const blob = await (await fetch(dataUrl)).blob();
+        const file = new File([blob],'oracle-illuminson.png',{type:'image/png'});
+        if(navigator.canShare && navigator.canShare({files:[file]})){
+          await navigator.share({files:[file], title:'Mon Oracle du Jour — Illumin&Son'});
+          btn.textContent='✦ Partager ma carte du jour ✦';
+          btn.disabled=false;
+          return;
+        }
+      } catch(e){}
+    }
+
+    // Fallback : téléchargement direct
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = `oracle-illuminson-${getToday()}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+  } catch(err){
+    console.error('Erreur génération image:', err);
+  }
+
+  btn.textContent='✦ Partager ma carte du jour ✦';
+  btn.disabled=false;
+}
+</script>
+</body>
+</html><!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oracle du Jour — Illumin&Son</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
 
