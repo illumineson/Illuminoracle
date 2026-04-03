@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oracle du Jour — Illumin&Son</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  body {
+    background: linear-gradient(160deg,#04080f 0%,#0a1535 50%,#081028 100%);
+    min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Cormorant Garamond',serif;
+  }
+  .oracle-scene {
+    display:flex; flex-direction:column; align-items:center;
+    gap:18px; padding:32px 16px 44px;
+    width:100%; max-width:420px;
+    position:relative; overflow:hidden;
+  }
+  .logo-text {
+    font-family:'Cinzel Decorative',serif;
+    font-size:15px; letter-spacing:0.14em; color:#c9a84c;
+    text-shadow:0 0 24px rgba(180,140,60,0.4); text-align:center;
+  }
+  .sub-text {
+    font-family:'Cormorant Garamond',serif; font-size:11px;
+    letter-spacing:0.3em; color:rgba(180,140,60,0.5);
+    text-transform:uppercase; margin-top:4px; text-align:center;
+  }
+  .divline {
+    width:80px; height:1px;
+    background:linear-gradient(90deg,transparent,rgba(180,140,60,0.6),transparent);
+  }
+  .ether-text {
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:13px; letter-spacing:0.12em;
+    color:rgba(180,140,60,0); text-align:center; height:20px;
+    transition:color 0.8s ease; pointer-events:none;
+  }
+  .ether-text.visible { color:rgba(180,140,60,0.75); }
+  .card-stage {
+    position:relative; width:250px; height:375px;
+    perspective:1000px; flex-shrink:0;
+  }
+  .card-spin {
+    width:100%; height:100%;
+    position:relative; transform-style:preserve-3d;
+    transform-origin:center center;
+    transition:transform 1.2s cubic-bezier(0.4,0,0.2,1);
+  }
+  .card-face {
+    position:absolute; inset:0;
+    backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    border-radius:12px; overflow:hidden;
+    box-shadow:0 8px 48px rgba(0,0,0,0.8),0 0 40px rgba(180,140,60,0.15);
+  }
+  .card-front { transform:rotateY(180deg); }
+  .card-glow {
+    position:absolute; inset:-14px; border-radius:26px;
+    pointer-events:none; opacity:0;
+    box-shadow:0 0 50px rgba(201,168,76,0.55);
+    transition:opacity 1s ease;
+  }
+  .card-back-inner {
+    width:100%; height:100%;
+    background: linear-gradient(135deg, #060d1f 0%, #0d1a3a 50%, #080f22 100%);
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+  }
+  .card-back-inner::before {
+    content:'';
+    position:absolute; inset:8px;
+    border:1px solid rgba(180,140,60,0.3);
+    border-radius:8px;
+  }
+  .card-back-inner::after {
+    content:'✦';
+    font-size:48px; color:rgba(180,140,60,0.35);
+    text-shadow:0 0 30px rgba(180,140,60,0.4);
+  }
+  .card-front-inner {
+    width:100%; height:100%;
+    background: linear-gradient(160deg, #080f22 0%, #0d1835 60%, #060d1f 100%);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:12px; padding:24px 16px;
+    position:relative;
+  }
+  .card-front-inner::before {
+    content:'';
+    position:absolute; inset:8px;
+    border:1px solid rgba(180,140,60,0.4);
+    border-radius:8px;
+  }
+  .card-num {
+    font-family:'Cinzel Decorative',serif; font-size:11px;
+    letter-spacing:0.3em; color:rgba(180,140,60,0.6);
+  }
+  .card-symbol {
+    font-size:42px; line-height:1;
+    filter:drop-shadow(0 0 12px rgba(180,140,60,0.5));
+  }
+  .card-titre {
+    font-family:'Cinzel Decorative',serif; font-size:11px;
+    letter-spacing:0.12em; color:#c9a84c; text-align:center;
+    line-height:1.5;
+  }
+  .card-divline {
+    width:40px; height:1px;
+    background:linear-gradient(90deg,transparent,rgba(180,140,60,0.5),transparent);
+  }
+  .btn-reveal {
+    font-family:'Cinzel Decorative',serif; font-size:10px;
+    letter-spacing:0.2em; color:#c9a84c; background:transparent;
+    border:1px solid rgba(180,140,60,0.55); border-radius:4px;
+    padding:12px 28px; cursor:pointer; transition:all 0.3s;
+  }
+  .btn-reveal:hover { background:rgba(180,140,60,0.1); box-shadow:0 0 20px rgba(180,140,60,0.2); }
+  .btn-reveal:disabled { opacity:0.4; cursor:default; }
+  .msg-box {
+    max-width:360px; width:100%;
+    background:rgba(10,18,50,0.8); border:1px solid rgba(180,140,60,0.25);
+    border-radius:12px; padding:20px 22px; text-align:center;
+    opacity:0; transform:translateY(14px);
+    transition:opacity 1.4s ease,transform 1.4s ease; pointer-events:none;
+  }
+  .msg-box.show { opacity:1; transform:translateY(0); pointer-events:all; }
+  .msg-label {
+    font-family:'Cinzel Decorative',serif; font-size:7.5px;
+    letter-spacing:0.35em; color:rgba(180,140,60,0.55); margin-bottom:10px;
+  }
+  .msg-text {
+    font-family:'Cormorant Garamond',serif; font-size:15px;
+    font-style:italic; line-height:1.8; color:#ddd0b8;
+  }
+  .panels {
+    display:flex; flex-direction:column; gap:10px;
+    max-width:360px; width:100%;
+    opacity:0; transform:translateY(10px);
+    transition:opacity 1.2s ease 0.4s,transform 1.2s ease 0.4s;
+    pointer-events:none;
+  }
+  .panels.show { opacity:1; transform:translateY(0); pointer-events:all; }
+  .panel-row { display:flex; gap:10px; }
+  .panel {
+    flex:1; border-radius:8px; padding:10px 13px;
+    font-family:'Cormorant Garamond',serif; font-size:13px; line-height:1.55;
+  }
+  .panel-label {
+    font-family:'Cinzel Decorative',serif; font-size:7px;
+    letter-spacing:0.28em; display:block; margin-bottom:5px; opacity:0.65;
+  }
+  .panel.lumiere { background:rgba(201,168,76,0.07); border:0.5px solid rgba(201,168,76,0.25); color:#d4b96a; }
+  .panel.ombre   { background:rgba(80,40,10,0.18);   border:0.5px solid rgba(180,100,40,0.22); color:#b07840; }
+  .panel.vigilance {
+    background:rgba(30,25,55,0.3); border:0.5px solid rgba(140,110,180,0.22);
+    color:#b8a8d0; font-style:italic;
+  }
+  .cta-row {
+    display:flex; gap:10px; flex-direction:column; align-items:center;
+    width:100%; max-width:310px;
+    opacity:0; transition:opacity 1.2s ease 0.8s; pointer-events:none;
+  }
+  .cta-row.show { opacity:1; pointer-events:all; }
+  .btn-rdv {
+    width:100%; font-family:'Cinzel Decorative',serif;
+    font-size:9px; letter-spacing:0.18em; color:#06090f;
+    background:linear-gradient(135deg,#a07828,#c9a84c,#f0d080);
+    border:none; border-radius:4px; padding:13px 20px;
+    cursor:pointer; transition:all 0.3s; text-decoration:none;
+    display:block; text-align:center;
+  }
+  .btn-rdv:hover { opacity:0.88; transform:translateY(-1px); }
+  .btn-contact {
+    width:100%; font-family:'Cormorant Garamond',serif;
+    font-size:14px; letter-spacing:0.1em; color:#c9a84c;
+    background:transparent; border:1px solid rgba(180,140,60,0.4);
+    border-radius:4px; padding:11px 20px;
+    cursor:pointer; transition:all 0.3s; text-decoration:none;
+    display:block; text-align:center;
+  }
+  .btn-contact:hover { border-color:#c9a84c; background:rgba(180,140,60,0.06); }
+  .tomorrow-box {
+    max-width:360px; width:100%; text-align:center;
+    padding:14px 18px;
+    background:rgba(10,18,50,0.5); border:1px solid rgba(180,140,60,0.15);
+    border-radius:10px;
+    opacity:0; transition:opacity 1.2s ease 1s; pointer-events:none;
+  }
+  .tomorrow-box.show { opacity:1; }
+  .tomorrow-text {
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:13px; letter-spacing:0.07em; color:rgba(180,140,60,0.55); line-height:1.6;
+  }
+  .spark { position:absolute; border-radius:50%; pointer-events:none; opacity:0; }
+  @keyframes sparkle {
+    0%   { opacity:0; transform:scale(0) translate(0,0); }
+    50%  { opacity:1; }
+    100% { opacity:0; transform:scale(1) translate(var(--tx),var(--ty)); }
+  }
+</style>
+</head>
+<body>
+<div class="oracle-scene" id="scene">
+  <div>
+    <div class="logo-text">Illumin&amp;Son</div>
+    <div class="sub-text">Oracle du Jour</div>
+  </div>
+  <div class="divline"></div>
+  <div class="ether-text" id="etherText">L'éther se connecte à ton âme…</div>
+  <div class="card-stage" id="cardStage">
+    <div class="card-glow" id="cardGlow"></div>
+    <div class="card-spin" id="cardSpin">
+      <div class="card-face card-back"><div class="card-back-inner"></div></div>
+      <div class="card-face card-front">
+        <div class="card-front-inner">
+          <div class="card-num" id="cardNum"></div>
+          <div class="card-symbol" id="cardSymbol"></div>
+          <div class="card-divline"></div>
+          <div class="card-titre" id="cardTitre"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="btn-reveal" id="btnReveal">✦ &nbsp;Révèle ta carte du jour&nbsp; ✦</button>
+  <div class="msg-box" id="msgBox">
+    <div class="msg-label">Message du jour</div>
+    <div class="msg-text" id="msgText"></div>
+  </div>
+  <div class="panels" id="panels">
+    <div class="panel-row">
+      <div class="panel lumiere"><span class="panel-label">✦ Lumière</span><span id="panLumiere"></span></div>
+      <div class="panel ombre"><span class="panel-label">◆ Ombre</span><span id="panOmbre"></span></div>
+    </div>
+    <div class="panel vigilance"><span class="panel-label">⚠ Vigilance</span><span id="panVigilance"></span></div>
+  </div>
+  <div class="cta-row" id="ctaRow">
+    <a class="btn-rdv" href="https://www.sumupbookings.com/illumin-son" target="_blank" rel="noopener">✦ &nbsp;Prendre rendez-vous&nbsp; ✦</a>
+    <a class="btn-contact" href="https://www.linktree.com/illumineson" target="_blank" rel="noopener">Nous contacter</a>
+  </div>
+  <div class="tomorrow-box" id="tomorrowBox">
+    <div class="tomorrow-text">Ton oracle se renouvelle chaque jour.<br>Reviens demain pour un nouveau message 🌙</div>
+  </div>
+</div>
+<script>
+const SYMBOLES = ['◎','✦','☽','⊕','⋈','⚡','❋','◈','∞','⊗','✿','⌘','△','☾','⊜','♡','⚖','★','☾','☀','◉','⚘','⊛','☿','♆','⊞','♁','⊟','☋','⊙','✺','⊠','⊡','⊢'];
+const CARTES = [
+  {n:0,titre:"Le Vide Sacré",msg:"Le 0 n'est pas l'absence — c'est le silence avant le premier souffle, l'espace où tout devient possible. Il vibre au-delà de toute limite, là où le potentiel pur n'a encore pris aucune forme. Recevoir le 0, c'est être invité à s'arrêter, à laisser le vide parler.",lumiere:"Potentiel illimité, ouverture totale, universalité.",ombre:"Sentiment de flottement, difficulté à s'ancrer, peur du vide intérieur.",vigilance:"Ne cherche pas à remplir le silence trop vite. Ce que tu ressens dans cet espace est précieux — accorde-toi le temps de l'habiter."},
+  {n:1,titre:"Le Commencement",msg:"Le 1 vibre avec l'énergie pure du début. Il avance, il trace, il ose — sans attendre la permission de qui que ce soit. Si ce nombre se présente à toi aujourd'hui, quelque chose en toi est prêt à prendre son élan. Un seul pas sincère suffit.",lumiere:"Leadership naturel, courage d'initier, confiance en soi et en ses élans.",ombre:"Tendance à tout vouloir porter seul, impatience, difficulté à recevoir de l'aide.",vigilance:"L'indépendance est une belle force, mais veille à ne pas fermer la porte aux autres. Avancer ensemble peut être aussi puissant qu'avancer seul."},
+  {n:2,titre:"L'Alliance",msg:"Le 2 est le nombre de la rencontre, de l'écoute, de ce qui se tisse doucement entre deux êtres. Il porte en lui la polarité sacrée et rappelle que l'équilibre ne s'impose jamais — il se cultive avec douceur.",lumiere:"Diplomatie, sens de l'écoute profonde, capacité à créer des liens durables.",ombre:"Hypersensibilité, dépendance affective, difficulté à s'affirmer par peur de blesser.",vigilance:"Prendre soin des autres est un beau don, mais n'oublie pas de prendre soin de toi aussi. Tes besoins ont autant de valeur."},
+  {n:3,titre:"L'Expression",msg:"Le 3 vibre à 3 : la trinité en mouvement — pensée, parole, action. Il déborde, il chante, il crée. C'est une permission : celle d'être joyeux, spontané, créatif, sans avoir besoin de tout justifier.",lumiere:"Créativité vivante, enthousiasme communicatif, joie d'exister et de partager.",ombre:"Dispersion, difficulté à terminer ce que l'on commence, tendance à rester en surface.",vigilance:"Ta créativité est un trésor, mais elle a besoin de direction. Choisis une intention et suis-la jusqu'au bout."},
+  {n:4,titre:"La Fondation",msg:"Le 4 vibre à 4 : l'énergie de la terre, de la structure, du travail qui dure. Il représente l'ordre, la responsabilité, la loyauté envers ce que l'on construit patiemment.",lumiere:"Stabilité, rigueur, fiabilité, capacité à bâtir durablement.",ombre:"Rigidité, résistance au changement, tendance à s'enfermer dans une routine.",vigilance:"La structure protège, mais elle ne doit pas étouffer. Laisse un peu de place à l'imprévu — parfois c'est là que la vie se révèle."},
+  {n:5,titre:"La Liberté",msg:"Le 5 vibre à 5 : l'énergie du mouvement, du changement, de l'aventure. Il réveille les sens et bouscule les certitudes. Recevoir ce nombre, c'est être invité à explorer, à faire confiance au désir de renouveau.",lumiere:"Adaptabilité, dynamisme, curiosité, goût de l'aventure.",ombre:"Instabilité, impulsivité, difficulté à s'engager sur le long terme.",vigilance:"La liberté est magnifique, mais elle a besoin d'un ancrage. Demande-toi ce qui mérite vraiment ta constance."},
+  {n:6,titre:"L'Harmonie",msg:"Le 6 vibre à 6 : l'énergie de l'amour en acte, du soin, de l'équilibre entre soi et les autres. Associé à la famille et à la beauté, il appelle une générosité naturelle et un profond désir de paix.",lumiere:"Amour bienveillant, sens du soin, harmonie dans les relations.",ombre:"Sacrifice excessif, perfectionnisme, possessivité.",vigilance:"Tu donnes beaucoup, parfois trop. S'occuper de toi n'est pas un manque d'amour pour les autres — c'en est la condition."},
+  {n:7,titre:"La Quête Intérieure",msg:"Le 7 vibre à 7 : le nombre sacré du chercheur spirituel, du philosophe. Il demande la solitude fertile, la méditation, la confiance envers les voies invisibles. Ce qui se présente mérite d'être regardé en profondeur.",lumiere:"Recherche intérieure, intuition fine, spiritualité, profondeur de pensée.",ombre:"Tendance à l'isolement, mélancolie, distance avec les autres.",vigilance:"La quête intérieure est précieuse, mais n'oublie pas de revenir au monde des vivants. Ton chemin a besoin de silence et de chaleur humaine."},
+  {n:8,titre:"La Puissance",msg:"Le 8 vibre à 8 : retourné c'est l'infini, debout c'est la force qui manifeste. Il porte l'ambition juste et le karma en mouvement — ce que tu sèmes aujourd'hui, tu le récolteras. Agis avec droiture.",lumiere:"Ambition juste, leadership, capacité à manifester l'abondance.",ombre:"Matérialisme, soif de pouvoir, insensibilité.",vigilance:"Le pouvoir que tu portes est réel — utilise-le avec conscience. Ce qui est construit sur des bases honnêtes est ce qui dure."},
+  {n:9,titre:"L'Achèvement",msg:"Le 9 vibre à 9 : il clôt le cycle, il porte toutes les leçons du chemin parcouru. C'est le nombre de l'humaniste universel, de celui qui a traversé et qui sait maintenant donner sans s'effacer.",lumiere:"Compassion profonde, sagesse universelle, générosité du cœur.",ombre:"Difficulté à lâcher ce qui est terminé, amertume, déception.",vigilance:"La fin d'un cycle n'est pas un échec — c'est une libération. Permets-toi de fermer cette porte avec gratitude."},
+  {n:10,titre:"Le Renouveau",msg:"Le 10 vibre à 1 (1+0), enrichi du potentiel infini du 0. C'est le retour à l'élan, mais avec toute l'expérience du cycle passé. Une nouvelle page commence — non par défaut, mais par choix éclairé.",lumiere:"Recommencement conscient, leadership amplifié, renouveau porteur.",ombre:"Indécision au seuil du nouveau, tension entre ce qui finit et ce qui commence.",vigilance:"Ce nouveau départ t'appartient. N'attends pas que tout soit parfait pour commencer."},
+  {n:11,titre:"L'Illumination",msg:"Le 11 est un nombre maître — il ne se réduit pas. Il vibre à haute fréquence, portant le don de l'intuition et de la lumière spirituelle. Ceux qui le reçoivent sont souvent des ponts entre les mondes.",lumiere:"Intuition élevée, inspiration, conscience spirituelle, capacité à guider.",ombre:"Anxiété, surcharge émotionnelle, sentiment d'être tiraillé entre deux mondes.",vigilance:"Ta sensibilité est une lumière, pas une fragilité. Apprends à la protéger autant qu'à la partager."},
+  {n:12,titre:"Le Retournement",msg:"Le 12 vibre à 3 (1+2). Il porte l'énergie créatrice du 3, passée par la dualité et le mouvement. Il invite à lâcher prise, à accepter qu'une pause ou un retournement soit parfois le chemin le plus juste.",lumiere:"Adaptabilité, vision d'ensemble, créativité portée par l'expérience.",ombre:"Indécision, dispersion, difficulté à choisir.",vigilance:"Parfois ce qui ressemble à un obstacle est une invitation à regarder les choses autrement."},
+  {n:13,titre:"La Transformation",msg:"Le 13 vibre à 4 (1+3). Ce nombre n'est pas la malchance — il est la mort symbolique de ce qui doit laisser la place. Ce qui se termine prépare l'espace d'une version plus libre de toi.",lumiere:"Transformation profonde, persévérance, capacité à renaître plus fort.",ombre:"Résistance au changement, peur de perdre ce qui est connu.",vigilance:"Ce qui s'effondre en toi ne t'abandonne pas — il te libère. Fais confiance à ce processus."},
+  {n:14,titre:"La Tempérance",msg:"Le 14 vibre à 5 (1+4). Il porte le mouvement du 5, mais tempéré par la sagesse de la mesure. C'est l'invitation au juste équilibre, à laisser les choses se mêler avec patience et fluidité.",lumiere:"Adaptabilité, liberté bien canalisée, capacité à s'ajuster sans perdre son axe.",ombre:"Instabilité, tendance à se disperser, difficulté à s'engager.",vigilance:"La liberté sans direction peut ressembler à de l'errance. Demande-toi ce qui mérite vraiment tes efforts."},
+  {n:15,titre:"L'Attachement",msg:"Le 15 vibre à 6 (1+5). Il porte l'amour du 6 traversé par l'intensité du désir. Ce nombre invite à regarder en face ce qui t'attache — par amour ou par peur — et à faire la différence entre les deux.",lumiere:"Sens de l'amour profond, harmonie, compassion, don pour la beauté.",ombre:"Jalousie, possessivité, dépendance affective.",vigilance:"L'amour vrai ne s'accroche pas — il fait confiance. Ce que tu portes t'allège-t-il ou t'alourdit-il ?"},
+  {n:16,titre:"L'Éclair",msg:"Le 16 vibre à 7 (1+6). Il porte la profondeur du 7, précédée d'un choc ou d'une révélation. Ce qui tombe était peut-être fragile depuis longtemps. Ce qui reste après l'éclair est réel.",lumiere:"Courage de voir la vérité, éveil spirituel, capacité à se reconstruire.",ombre:"Illusions entretenues, arrogance, résistance aux vérités qui dérangent.",vigilance:"Ce qui se bouleverse ne te détruit pas — il te recentre. Fais confiance à ce qui résiste après la tempête."},
+  {n:17,titre:"L'Étoile",msg:"Le 17 vibre à 8 (1+7). Il porte la force de manifestation du 8, guidée par la lumière de l'étoile intérieure. Même après les épreuves, quelque chose en toi sait encore où aller.",lumiere:"Résilience, persévérance, foi en l'avenir, capacité à transformer les épreuves.",ombre:"Entêtement, auto-sabotage, résistance à l'aide.",vigilance:"Ta force intérieure est réelle, mais elle n'est pas obligée de tout porter seule."},
+  {n:18,titre:"L'Illusion",msg:"Le 18 vibre à 9 (1+8). Il porte l'humanisme du 9, traversé par les eaux troubles de la Lune. C'est le nombre des profondeurs psychiques. Ce que tu ressens mérite d'être regardé avec douceur et honnêteté.",lumiere:"Profondeur émotionnelle, compassion, intuition fine.",ombre:"Confusion, peurs irrationnelles, tendance à se mentir à soi-même.",vigilance:"Distingue ce qui vient de ton intuition et ce qui vient de ta peur. Ils ne t'emmènent pas au même endroit."},
+  {n:19,titre:"Le Soleil",msg:"Le 19 vibre à 1 (1+9). C'est le retour à l'élan du 1, enrichi de tout ce que le 9 a traversé. La renaissance lumineuse, le nouveau départ qui porte en lui la sagesse du chemin parcouru.",lumiere:"Joie rayonnante, vitalité, succès issu de l'expérience, leadership lumineux.",ombre:"Narcissisme, besoin de reconnaissance, difficulté à partager la lumière.",vigilance:"Brille, mais sans oublier ceux qui sont dans l'ombre. Ta lumière est plus belle quand elle en éclaire d'autres."},
+  {n:20,titre:"L'Éveil",msg:"Le 20 vibre à 2 (2+0), amplifié par le potentiel du 0. Il porte la sensibilité du 2 avec une ouverture spirituelle décuplée. Quelque chose en toi entend un appel — oses-tu lui répondre ?",lumiere:"Intuition amplifiée, sensibilité spirituelle, capacité à percevoir ce qui se passe vraiment.",ombre:"Indécision, émotivité excessive, dépendance au regard des autres.",vigilance:"Ce que tu ressens profondément est une information précieuse. Apprends à lui faire confiance avant de chercher la confirmation à l'extérieur."},
+  {n:21,titre:"L'Accomplissement",msg:"Le 21 vibre à 3 (2+1). C'est la trinité accomplie — le cycle s'est fermé dans la joie et la plénitude. Ce nombre célèbre la complétude, la réussite qui vient d'un travail profond et joyeux.",lumiere:"Plénitude, succès mérité, créativité accomplie, joie de la réalisation.",ombre:"Peur de devoir recommencer, attachement aux acquis, difficulté à aller au-delà.",vigilance:"Ce que tu as construit est réel et beau. Mais le mouvement de la vie t'appelle vers un nouveau cycle — reçois cette invitation avec légèreté."},
+  {n:22,titre:"Le Bâtisseur",msg:"Le 22 est le deuxième nombre maître — celui du bâtisseur de mondes. Il porte une vision immense et la capacité concrète de la manifester. C'est l'architecte du possible, le pont entre le rêve et le réel.",lumiere:"Vision grandiose, capacité de manifestation, leadership au service du collectif.",ombre:"Perfectionnisme paralysant, peur de la grandeur, tendance à se sous-estimer.",vigilance:"Ce que tu portes en toi est plus grand que tu ne le crois. Tu n'as pas à tout réaliser seul, mais tu as à commencer."},
+  {n:23,titre:"La Grâce",msg:"Le 23 vibre à 5 (2+3). Il porte la liberté du 5 avec une touche de grâce particulière. C'est le nombre de ceux qui avancent avec légèreté, qui savent danser avec les imprévus sans perdre leur centre.",lumiere:"Grâce naturelle, adaptabilité, charme authentique, capacité à inspirer.",ombre:"Superficialité, instabilité, séduction sans profondeur.",vigilance:"Ta légèreté est un don, mais veille à ne pas effleurer là où tu pourrais vraiment toucher. Va plus loin."},
+  {n:24,titre:"La Bienveillance",msg:"Le 24 vibre à 6 (2+4). Il amplifie l'amour du 6 par la douceur du 2 et la stabilité du 4. C'est l'énergie de celui qui prend soin avec constance, qui crée un foyer pour les âmes qui cherchent refuge.",lumiere:"Générosité durable, sens du service, capacité à créer des espaces de paix.",ombre:"Oubli de soi, sacrifice chronique, difficulté à recevoir.",vigilance:"Tu sais si bien donner. Aujourd'hui, laisse quelqu'un prendre soin de toi — c'est aussi une forme de courage."},
+  {n:25,titre:"L'Introspection",msg:"Le 25 vibre à 7 (2+5). La profondeur du 7 rencontre la fluidité du 5 et la sensibilité du 2. C'est l'invitation à plonger dans les eaux profondes de soi, à explorer ce que les agitations de surface cachent.",lumiere:"Profondeur psychique, sagesse intuitive, capacité d'analyse intérieure.",ombre:"Repli sur soi, rumination, tendance à trop analyser.",vigilance:"Le silence intérieur est une ressource, pas une retraite. Reviens vers les autres avec ce que tu as trouvé en toi."},
+  {n:26,titre:"L'Abondance",msg:"Le 26 vibre à 8 (2+6). La puissance du 8 prend racine dans la douceur du 2 et l'harmonie du 6. C'est l'abondance qui vient du cœur — pas seulement matérielle, mais relationnelle et spirituelle.",lumiere:"Abondance équilibrée, sens des responsabilités, générosité juste.",ombre:"Attachement aux possessions, peur de manquer, déséquilibre entre donner et recevoir.",vigilance:"L'abondance se construit aussi dans l'espace intérieur. Ce dont tu as vraiment besoin est peut-être plus simple que ce que tu crois."},
+  {n:27,titre:"La Sagesse du Cœur",msg:"Le 27 vibre à 9 (2+7). La sagesse universelle du 9 s'exprime à travers la sensibilité du 2 et la profondeur du 7. C'est l'intelligence du cœur — celle qui sait sans avoir besoin de preuves.",lumiere:"Sagesse émotionnelle, compassion profonde, don pour guider les autres.",ombre:"Désillusion, retrait du monde, difficulté à accepter l'imperfection humaine.",vigilance:"Ta sagesse est un cadeau pour ceux qui t'entourent. Partage-la avec humilité — sans attendre qu'ils soient prêts à l'entendre."},
+  {n:28,titre:"Le Pionnier",msg:"Le 28 vibre à 1 (2+8). L'élan du 1 émerge de la profondeur du 8 et la douceur du 2. C'est le leader qui avance avec courage mais aussi avec conscience des autres — le pionnier bienveillant.",lumiere:"Courage d'initier, sensibilité aux besoins collectifs, leadership équilibré.",ombre:"Manque de confiance en soi malgré les capacités, dépendance à l'approbation.",vigilance:"Tu es prêt, même si tu ne te sens pas encore prêt. Ce que tu vois comme une hésitation est parfois une sagesse — mais à un moment, il faut franchir le seuil."},
+  {n:29,titre:"Le Passage",msg:"Le 29 vibre à 11, nombre maître (2+9). C'est un seuil — un entre-deux chargé d'intensité. Il porte les dons de l'illumination mais aussi l'épreuve de la purification. Ce que tu traverses maintenant a un sens profond.",lumiere:"Sensibilité élevée, capacité de transformation, don de l'intuition maîtrisée.",ombre:"Vulnérabilité extrême, sentiment d'incompréhension, dualité intérieure.",vigilance:"Ce que tu vis est réel et intense. Tu n'as pas à minimiser ce que tu ressens. Demande de l'aide si le passage est trop étroit."},
+  {n:30,titre:"La Créativité Pure",msg:"Le 30 vibre à 3 (3+0), amplifié par le potentiel infini du 0. C'est la créativité dans son état le plus pur — sans limites, sans contraintes, juste l'expression qui jaillit du silence.",lumiere:"Créativité illimitée, joie de l'expression, inspiration spontanée.",ombre:"Manque de structure, dispersion, difficulté à concrétiser les idées.",vigilance:"Tes idées sont précieuses. Donne-leur un cadre, même léger — c'est ce qui leur permettra de toucher les autres."},
+  {n:31,titre:"La Persévérance",msg:"Le 31 vibre à 4 (3+1). La stabilité du 4 porte en elle l'élan créatif du 3. C'est la persévérance joyeuse — celle qui construit avec enthousiasme, qui trouve de la beauté dans la discipline.",lumiere:"Détermination créative, sens pratique inspiré, capacité à bâtir dans la durée.",ombre:"Rigidité masquée par l'activité, perfectionnisme, difficulté à déléguer.",vigilance:"Ce que tu construis mérite ta patience. Ne sacrifie pas la qualité à la vitesse — ni la vitesse à la peur de l'imperfection."},
+  {n:32,titre:"La Communication Sacrée",msg:"Le 32 vibre à 5 (3+2). L'élan communicatif du 3 rencontre la douceur et la diplomatie du 2. C'est le nombre du messager de l'âme — celui qui sait mettre des mots sur ce qui semblait indicible.",lumiere:"Éloquence, don pour relier les êtres, capacité à exprimer les vérités profondes.",ombre:"Besoin excessif d'être compris, paroles blessantes dites sans intention, bavardage.",vigilance:"Tes mots ont du poids. Avant de parler, demande-toi si ce que tu veux dire vient du cœur ou de la peur."},
+  {n:33,titre:"Le Maître Guérisseur",msg:"Le 33 est le troisième nombre maître — celui du guérisseur universel. Il porte l'amour inconditionnel dans sa forme la plus haute. Recevoir ce nombre, c'est être appelé à servir avec tout ce que l'on est.",lumiere:"Amour universel, don de guérison, enseignement par l'exemple, compassion totale.",ombre:"Martyr, sacrifice de soi jusqu'à l'épuisement, difficulté à recevoir ce que l'on donne.",vigilance:"Tu ne peux pas donner ce que tu n'as pas. Prends soin de toi avec autant d'amour que tu en offres aux autres — c'est le fondement de ton don."}
+];
+
+function getDateKey() {
+  const d = new Date();
+  return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+}
+function getCardForToday() {
+  const key = getDateKey();
+  const saved = localStorage.getItem('oracle_date');
+  const savedIdx = localStorage.getItem('oracle_idx');
+  if (saved === key && savedIdx !== null) {
+    return { carte: CARTES[parseInt(savedIdx)], alreadyDrawn: true };
+  }
+  const d = new Date();
+  const seed = d.getFullYear()*10000 + (d.getMonth()+1)*100 + d.getDate();
+  const idx = seed % CARTES.length;
+  return { carte: CARTES[idx], alreadyDrawn: false, idx };
+}
+
+const btn      = document.getElementById('btnReveal');
+const cardSpin = document.getElementById('cardSpin');
+const cardGlow = document.getElementById('cardGlow');
+const etherTxt = document.getElementById('etherText');
+const msgBox   = document.getElementById('msgBox');
+const msgText  = document.getElementById('msgText');
+const panels   = document.getElementById('panels');
+const ctaRow   = document.getElementById('ctaRow');
+const tomorrowBox = document.getElementById('tomorrowBox');
+
+function fillCard(carte) {
+  document.getElementById('cardNum').textContent     = '— '+carte.n+' —';
+  document.getElementById('cardSymbol').textContent  = SYMBOLES[carte.n]||'✦';
+  document.getElementById('cardTitre').textContent   = carte.titre;
+  document.getElementById('panLumiere').textContent  = carte.lumiere;
+  document.getElementById('panOmbre').textContent    = carte.ombre;
+  document.getElementById('panVigilance').textContent= carte.vigilance;
+  msgText.textContent = carte.msg;
+}
+function spawnSparks() {
+  const scene = document.getElementById('scene');
+  const stage = document.getElementById('cardStage');
+  const rect  = stage.getBoundingClientRect();
+  const sr    = scene.getBoundingClientRect();
+  for (let i=0; i<12; i++) {
+    const sp = document.createElement('div');
+    sp.className = 'spark';
+    const size = 2+Math.random()*4;
+    const angle = Math.random()*Math.PI*2;
+    const dist  = 60+Math.random()*80;
+    sp.style.cssText = 'width:'+size+'px;height:'+size+'px;background:rgba(201,168,76,'+(0.6+Math.random()*0.4)+');left:'+(rect.left-sr.left+rect.width/2)+'px;top:'+(rect.top-sr.top+rect.height/2)+'px;--tx:'+(Math.cos(angle)*dist)+'px;--ty:'+(Math.sin(angle)*dist)+'px;animation:sparkle '+(0.6+Math.random()*0.8)+'s ease-out '+(Math.random()*0.3)+'s forwards;';
+    scene.appendChild(sp);
+    setTimeout(()=>sp.remove(),1400);
+  }
+}
+function reveal(carte) {
+  btn.disabled = true;
+  etherTxt.classList.add('visible');
+  setTimeout(()=>{ fillCard(carte); cardSpin.style.transform='rotateY(180deg)'; },800);
+  setTimeout(()=>{ cardGlow.style.opacity='1'; spawnSparks(); },1800);
+  const key = getDateKey();
+  const idx = CARTES.indexOf(carte);
+  localStorage.setItem('oracle_date',key);
+  localStorage.setItem('oracle_idx',idx);
+  setTimeout(()=>{ msgBox.classList.add('show'); },2200);
+  setTimeout(()=>{ panels.classList.add('show'); },2800);
+  setTimeout(()=>{ ctaRow.classList.add('show'); tomorrowBox.classList.add('show'); btn.style.display='none'; etherTxt.classList.remove('visible'); },3400);
+}
+
+const { carte, alreadyDrawn } = getCardForToday();
+if (alreadyDrawn) {
+  fillCard(carte);
+  cardSpin.style.transition='none';
+  cardSpin.style.transform='rotateY(180deg)';
+  cardGlow.style.opacity='1';
+  msgBox.classList.add('show');
+  panels.classList.add('show');
+  ctaRow.classList.add('show');
+  tomorrowBox.classList.add('show');
+  btn.style.display='none';
+} else {
+  btn.addEventListener('click',()=>reveal(carte));
+}
+</script>
+</body>
+</html>
