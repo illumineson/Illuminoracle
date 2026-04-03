@@ -89,10 +89,11 @@
   .msg-label {
     font-family:'Cinzel Decorative',serif; font-size:11px;
     letter-spacing:0.35em; color:rgba(180,140,60,0.75); margin-bottom:14px;
+    font-weight:700;
   }
   .msg-text {
-    font-family:'Cormorant Garamond',serif; font-size:20px;
-    font-style:italic; line-height:1.8; color:#ddd0b8;
+    font-family:'Cormorant Garamond',serif; font-size:19px;
+    font-style:italic; line-height:1.85; color:#ddd0b8;
   }
 
   /* ── Panneaux ── */
@@ -107,11 +108,12 @@
   .panel-row { display:flex; gap:12px; }
   .panel {
     flex:1; border-radius:8px; padding:14px 16px;
-    font-family:'Cormorant Garamond',serif; font-size:18px; line-height:1.6;
+    font-family:'Cormorant Garamond',serif; font-size:22px; line-height:1.65;
   }
   .panel-label {
     font-family:'Cinzel Decorative',serif; font-size:11px;
     letter-spacing:0.28em; display:block; margin-bottom:8px; opacity:0.85;
+    font-weight:700;
   }
   .panel.lumiere { background:rgba(201,168,76,0.07); border:0.5px solid rgba(201,168,76,0.25); color:#d4b96a; }
   .panel.ombre   { background:rgba(80,40,10,0.18);   border:0.5px solid rgba(180,100,40,0.22); color:#b07840; }
@@ -138,7 +140,7 @@
   .btn-rdv:hover { opacity:0.88; transform:translateY(-1px); }
   .btn-contact {
     width:100%; font-family:'Cormorant Garamond',serif;
-    font-size:18px; letter-spacing:0.1em; color:#c9a84c;
+    font-size:19px; letter-spacing:0.1em; color:#c9a84c;
     background:transparent; border:1px solid rgba(180,140,60,0.4);
     border-radius:4px; padding:14px 20px;
     cursor:pointer; transition:all 0.3s; text-decoration:none;
@@ -157,7 +159,7 @@
   .tomorrow-box.show { opacity:1; }
   .tomorrow-text {
     font-family:'Cormorant Garamond',serif; font-style:italic;
-    font-size:17px; letter-spacing:0.07em; color:rgba(180,140,60,0.65); line-height:1.7;
+    font-size:19px; letter-spacing:0.07em; color:rgba(180,140,60,0.65); line-height:1.75;
   }
 
   /* ── Déjà tiré ── */
@@ -173,21 +175,41 @@
   }
   .already-text {
     font-family:'Cormorant Garamond',serif; font-style:italic;
-    font-size:19px; line-height:1.8; color:#ddd0b8; margin-bottom:18px;
+    font-size:19px; line-height:1.85; color:#ddd0b8; margin-bottom:18px;
   }
 
-  /* ── Sparks ── */
+  /* ── Disclaimer après tirage ── */
+  .disclaimer {
+    max-width:400px; width:100%; text-align:center;
+    padding:14px 18px;
+    opacity:0; transition:opacity 1.2s ease 1.2s; pointer-events:none;
+  }
+  .disclaimer.show { opacity:1; pointer-events:all; }
+
+  /* ── Disclaimer accueil ── */
+  .disclaimer-accueil {
+    max-width:400px; width:100%; text-align:center;
+    padding:14px 18px;
+  }
+
+  /* Texte commun aux deux disclaimers */
+  .disclaimer-text {
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:17px; letter-spacing:0.05em; color:rgba(220,195,140,0.55); line-height:1.75;
+  }
+
   .spark { position:absolute; border-radius:50%; pointer-events:none; opacity:0; }
 
   /* ── Reset ── */
   .btn-reset {
-    font-family:'Cormorant Garamond',serif; font-style:italic;
-    font-size:16px; letter-spacing:0.12em; color:rgba(180,140,60,0.5);
-    background:transparent; border:1px solid rgba(180,140,60,0.25);
-    border-radius:4px; padding:10px 20px; cursor:pointer;
-    transition:all 0.3s; margin-top:6px;
+    width:100%; max-width:400px;
+    background:transparent;
+    border:1px solid rgba(180,140,60,0.28);
+    border-radius:4px; padding:12px 20px; cursor:pointer;
+    transition:all 0.3s; margin-top:4px;
+    opacity:0.45; min-height:42px;
   }
-  .btn-reset:hover { color:#c9a84c; border-color:rgba(180,140,60,0.6); }
+  .btn-reset:hover { opacity:0.75; border-color:rgba(180,140,60,0.55); }
 </style>
 </head>
 <body>
@@ -212,6 +234,11 @@
   </div>
 
   <button class="btn-reveal" id="btnReveal">✦ &nbsp;Révèle ta carte du jour&nbsp; ✦</button>
+
+  <!-- Disclaimer visible dès l'accueil sous le bouton -->
+  <div class="disclaimer-accueil" id="disclaimerAccueil">
+    <div class="disclaimer-text">Cet oracle est un outil de réflexion et d'inspiration personnelle. Il ne prétend pas détenir la vérité sur ta vie, tes choix ou ton avenir. Seul·e toi sais ce qui est juste pour toi. Accueille ce message comme une invitation à regarder en toi — non comme une certitude.</div>
+  </div>
 
   <div class="msg-box" id="msgBox">
     <div class="msg-label">Message du jour</div>
@@ -244,7 +271,12 @@
     <div class="tomorrow-text">Ton oracle se renouvelle chaque jour.<br>Reviens demain pour un nouveau message 🌙</div>
   </div>
 
-  <button class="btn-reset" id="btnReset" style="display:none" onclick="resetDraw()">↺ &nbsp;Réinitialiser le tirage</button>
+  <!-- Disclaimer après tirage — caché au départ, apparaît en bas -->
+  <div class="disclaimer" id="disclaimerBox">
+    <div class="disclaimer-text">Cet oracle est un outil de réflexion et d'inspiration personnelle. Il ne prétend pas détenir la vérité sur ta vie, tes choix ou ton avenir. Seul·e toi sais ce qui est juste pour toi. Accueille ce message comme une invitation à regarder en toi — non comme une certitude.</div>
+  </div>
+
+  <button class="btn-reset" id="btnReset" style="display:none" onclick="resetDraw()"></button>
 
 </div>
 
@@ -253,209 +285,209 @@
 // DONNÉES — 0 à 33
 // ══════════════════════════════════════════════════════════
 const CARTES = [
-  { n:0,  titre:"Le Vide Sacré",
-    msg:"Le 0 n'est pas l'absence — c'est le silence avant le premier souffle, l'espace où tout devient possible. Il vibre au-delà de toute limite, là où le potentiel pur n'a encore pris aucune forme. Recevoir le 0, c'est être invité à s'arrêter, à laisser le vide parler.",
-    lumiere:"Potentiel illimité, ouverture totale, universalité.",
-    ombre:"Sentiment de flottement, difficulté à s'ancrer, peur du vide intérieur.",
-    vigilance:"Ne cherche pas à remplir le silence trop vite. Ce que tu ressens dans cet espace est précieux — accorde-toi le temps de l'habiter." },
+  { n:0, titre:"Le Vide Sacré",
+    msg:"Le 0 est à la fois le début et la fin de toute chose. Il représente le vide pur, mais aussi l'infini — tout ce qui peut naître existe déjà en lui. C'est le nombre de tous les possibles, celui qui n'est limité par rien ni personne. Quand le 0 se présente, c'est une invitation à faire le silence, à laisser l'espace parler avant d'agir.",
+    lumiere:"Potentiel illimité, ouverture totale, capacité à tout accueillir sans jugement.",
+    ombre:"Manque de forme, sentiment de vide, difficulté à trouver une direction claire.",
+    vigilance:"Le silence que tu ressens n'est pas un manque — c'est un espace de création. Laisse quelque chose naître avant de chercher à le remplir." },
 
-  { n:1,  titre:"Le Commencement",
-    msg:"Le 1 vibre avec l'énergie pure du début. Il avance, il trace, il ose — sans attendre la permission de qui que ce soit. Si ce nombre se présente à toi aujourd'hui, quelque chose en toi est prêt à prendre son élan. Un seul pas sincère suffit.",
-    lumiere:"Leadership naturel, courage d'initier, confiance en soi et en ses élans.",
-    ombre:"Tendance à tout vouloir porter seul, impatience, difficulté à recevoir de l'aide.",
-    vigilance:"L'indépendance est une belle force, mais veille à ne pas fermer la porte aux autres. Avancer ensemble peut être aussi puissant qu'avancer seul." },
+  { n:1, titre:"Le Commencement",
+    msg:"Le 1 est le premier souffle, l'élan pur de celui qui ose commencer. Il symbolise l'origine, l'initiative et la force du leader naturel. C'est le nombre de celui qui trace son propre chemin avec confiance et détermination. Si le 1 se présente aujourd'hui, quelque chose en toi est prêt à démarrer — fais-lui confiance.",
+    lumiere:"Leadership naturel, indépendance, courage d'initier, force intérieure.",
+    ombre:"Égocentrisme, impatience, tendance à tout vouloir maîtriser seul.",
+    vigilance:"Ton élan est précieux, mais veille à laisser de la place aux autres. La vraie force sait aussi écouter." },
 
-  { n:2,  titre:"L'Alliance",
-    msg:"Le 2 est le nombre de la rencontre, de l'écoute, de ce qui se tisse doucement entre deux êtres. Il porte en lui la polarité sacrée et rappelle que l'équilibre ne s'impose jamais — il se cultive avec douceur.",
-    lumiere:"Diplomatie, sens de l'écoute profonde, capacité à créer des liens durables.",
-    ombre:"Hypersensibilité, dépendance affective, difficulté à s'affirmer par peur de blesser.",
-    vigilance:"Prendre soin des autres est un beau don, mais n'oublie pas de prendre soin de toi aussi. Tes besoins ont autant de valeur." },
+  { n:2, titre:"L'Alliance",
+    msg:"Le 2 est le nombre de la douceur, du lien et de la coopération. Il cherche l'harmonie, sait voir les deux côtés des choses et préfère unir plutôt que diviser. C'est une énergie de paix, de patience et d'intuition fine. Si le 2 arrive aujourd'hui, les relations autour de toi ont besoin de ta présence bienveillante.",
+    lumiere:"Diplomatie, intuition, sens de la justice, capacité à créer des ponts entre les êtres.",
+    ombre:"Hésitation, dépendance affective, tendance à s'effacer pour éviter les conflits.",
+    vigilance:"Chercher la paix est beau, mais pas au prix de te trahir. Tu as le droit d'avoir tes propres besoins." },
 
-  { n:3,  titre:"L'Expression",
-    msg:"Le 3 vibre à 3 : la trinité en mouvement — pensée, parole, action. Il déborde, il chante, il crée. C'est une permission : celle d'être joyeux, spontané, créatif, sans avoir besoin de tout justifier.",
-    lumiere:"Créativité vivante, enthousiasme communicatif, joie d'exister et de partager.",
-    ombre:"Dispersion, difficulté à terminer ce que l'on commence, tendance à rester en surface.",
-    vigilance:"Ta créativité est un trésor, mais elle a besoin de direction. Choisis une intention et suis-la jusqu'au bout." },
+  { n:3, titre:"L'Expression",
+    msg:"Le 3 déborde de vie. C'est le nombre de la créativité, de la parole et de la joie de partager. Il invite à s'exprimer librement, à inspirer les autres et à laisser parler l'artiste qui est en toi. Ceux qui portent le 3 illuminent leur entourage par leur enthousiasme et leur générosité créative.",
+    lumiere:"Créativité, enthousiasme, expression artistique, joie de vivre contagieuse.",
+    ombre:"Dispersion, superficialité, difficulté à finir ce que l'on commence.",
+    vigilance:"Ton énergie créatrice est un don — mais elle a besoin de direction. Choisis ce qui compte vraiment et vas jusqu'au bout." },
 
-  { n:4,  titre:"La Fondation",
-    msg:"Le 4 vibre à 4 : l'énergie de la terre, de la structure, du travail qui dure. Il représente l'ordre, la responsabilité, la loyauté envers ce que l'on construit patiemment.",
-    lumiere:"Stabilité, rigueur, fiabilité, capacité à bâtir durablement.",
-    ombre:"Rigidité, résistance au changement, tendance à s'enfermer dans une routine.",
-    vigilance:"La structure protège, mais elle ne doit pas étouffer. Laisse un peu de place à l'imprévu — parfois c'est là que la vie se révèle." },
+  { n:4, titre:"La Fondation",
+    msg:"Le 4 est le pilier. Il représente la solidité, l'ordre et la construction patiente. C'est le nombre de ceux qui bâtissent sur des bases solides, travaillent avec méthode et restent fidèles à leurs engagements. Quand le 4 apparaît, il t'invite à poser des fondations durables et à honorer ce que tu construis.",
+    lumiere:"Stabilité, rigueur, loyauté, sens des responsabilités, travail bien fait.",
+    ombre:"Rigidité, obstination, résistance au changement, difficulté à sortir de la routine.",
+    vigilance:"La structure est une force, mais elle ne doit pas devenir une prison. Permets-toi un peu de souplesse — la vie ne se laisse pas toujours mettre dans des cases." },
 
-  { n:5,  titre:"La Liberté",
-    msg:"Le 5 vibre à 5 : l'énergie du mouvement, du changement, de l'aventure. Il réveille les sens et bouscule les certitudes. Recevoir ce nombre, c'est être invité à explorer, à faire confiance au désir de renouveau.",
-    lumiere:"Adaptabilité, dynamisme, curiosité, goût de l'aventure.",
-    ombre:"Instabilité, impulsivité, difficulté à s'engager sur le long terme.",
-    vigilance:"La liberté est magnifique, mais elle a besoin d'un ancrage. Demande-toi ce qui mérite vraiment ta constance." },
+  { n:5, titre:"La Liberté",
+    msg:"Le 5 est l'énergie du mouvement, du changement et de l'aventure. Il symbolise la soif de liberté et d'expériences nouvelles. Curieux, social et toujours en quête de quelque chose de vivant, il réveille les sens et bouscule les certitudes installées. Quand le 5 arrive, c'est une invitation à bouger, à explorer, à oser.",
+    lumiere:"Liberté, adaptabilité, curiosité, dynamisme, goût de l'aventure.",
+    ombre:"Instabilité, impulsivité, irresponsabilité, peur de l'engagement.",
+    vigilance:"La liberté est magnifique, mais sans ancrage elle peut devenir fuite. Demande-toi ce que tu cherches vraiment dans ce mouvement." },
 
-  { n:6,  titre:"L'Harmonie",
-    msg:"Le 6 vibre à 6 : l'énergie de l'amour en acte, du soin, de l'équilibre entre soi et les autres. Associé à la famille et à la beauté, il appelle une générosité naturelle et un profond désir de paix.",
-    lumiere:"Amour bienveillant, sens du soin, harmonie dans les relations.",
-    ombre:"Sacrifice excessif, perfectionnisme, possessivité.",
-    vigilance:"Tu donnes beaucoup, parfois trop. S'occuper de toi n'est pas un manque d'amour pour les autres — c'en est la condition." },
+  { n:6, titre:"L'Harmonie",
+    msg:"Le 6 est le nombre de l'amour en action. Il représente le soin, la famille, la protection et l'équilibre dans les relations. C'est une énergie généreuse et aimante, naturellement tournée vers le bien des autres. Quand le 6 se présente, il t'invite à chérir tes liens et à prendre soin de ceux qui t'entourent.",
+    lumiere:"Amour, compassion, sens du soin, harmonie familiale, loyauté.",
+    ombre:"Sacrifice excessif, possessivité, tendance à contrôler par amour.",
+    vigilance:"Donner est beau, mais donner trop peut t'épuiser. Prends soin des autres sans t'oublier toi-même." },
 
-  { n:7,  titre:"La Quête Intérieure",
-    msg:"Le 7 vibre à 7 : le nombre sacré du chercheur spirituel, du philosophe. Il demande la solitude fertile, la méditation, la confiance envers les voies invisibles. Ce qui se présente mérite d'être regardé en profondeur.",
-    lumiere:"Recherche intérieure, intuition fine, spiritualité, profondeur de pensée.",
-    ombre:"Tendance à l'isolement, mélancolie, distance avec les autres.",
-    vigilance:"La quête intérieure est précieuse, mais n'oublie pas de revenir au monde des vivants. Ton chemin a besoin de silence et de chaleur humaine." },
+  { n:7, titre:"La Quête Intérieure",
+    msg:"Le 7 est le chercheur de sens, le philosophe, l'âme qui va toujours plus loin que les apparences. Il est attiré par les mystères de la vie, la spiritualité et la compréhension profonde. Il a besoin de silence pour penser, de solitude pour ressentir. Quand le 7 se présente, il t'invite à regarder en toi avant de chercher ailleurs.",
+    lumiere:"Spiritualité, intuition profonde, analyse, sagesse intérieure.",
+    ombre:"Isolement, mélancolie, distance avec les autres, repli sur soi.",
+    vigilance:"Ton monde intérieur est riche — mais n'oublie pas ceux qui t'entourent. La sagesse s'épanouit quand elle est partagée." },
 
-  { n:8,  titre:"La Puissance",
-    msg:"Le 8 vibre à 8 : retourné c'est l'infini, debout c'est la force qui manifeste. Il porte l'ambition juste et le karma en mouvement — ce que tu sèmes aujourd'hui, tu le récolteras. Agis avec droiture.",
-    lumiere:"Ambition juste, leadership, capacité à manifester l'abondance.",
-    ombre:"Matérialisme, soif de pouvoir, insensibilité.",
-    vigilance:"Le pouvoir que tu portes est réel — utilise-le avec conscience. Ce qui est construit sur des bases honnêtes est ce qui dure." },
+  { n:8, titre:"La Puissance",
+    msg:"Le 8 est le nombre de l'ambition et de la force de manifestation. Il représente le pouvoir, la réussite et le karma — ce que tu sèmes, tu le récolteras. Couché, le 8 devient l'infini. Il t'invite à agir avec intégrité, car tout ce que tu construis aujourd'hui aura des conséquences demain.",
+    lumiere:"Ambition, autorité, sens des responsabilités, capacité à bâtir l'abondance.",
+    ombre:"Matérialisme, abus de pouvoir, insensibilité, attachement excessif aux résultats.",
+    vigilance:"Le succès bâti sur l'honnêteté et le respect dure. Rappelle-toi que le pouvoir est un outil, pas un but." },
 
-  { n:9,  titre:"L'Achèvement",
-    msg:"Le 9 vibre à 9 : il clôt le cycle, il porte toutes les leçons du chemin parcouru. C'est le nombre de l'humaniste universel, de celui qui a traversé et qui sait maintenant donner sans s'effacer.",
-    lumiere:"Compassion profonde, sagesse universelle, générosité du cœur.",
-    ombre:"Difficulté à lâcher ce qui est terminé, amertume, déception.",
-    vigilance:"La fin d'un cycle n'est pas un échec — c'est une libération. Permets-toi de fermer cette porte avec gratitude." },
+  { n:9, titre:"L'Achèvement",
+    msg:"Le 9 porte en lui toute la sagesse du chemin parcouru. C'est le nombre de la fin de cycle, de la compassion universelle et du don de soi. Ceux qui le portent ont traversé beaucoup et savent maintenant donner sans compter. Quand le 9 apparaît, quelque chose touche à sa fin — et c'est une belle chose.",
+    lumiere:"Compassion, générosité, sagesse universelle, capacité à lâcher prise avec grâce.",
+    ombre:"Difficulté à clore, amertume, tendance à se sacrifier jusqu'à l'épuisement.",
+    vigilance:"La fin d'un cycle n'est pas une perte — c'est une libération. Permets-toi de fermer cette porte avec gratitude." },
 
   { n:10, titre:"Le Renouveau",
-    msg:"Le 10 vibre à 1 (1+0), enrichi du potentiel infini du 0. C'est le retour à l'élan, mais avec toute l'expérience du cycle passé. Une nouvelle page commence — non par défaut, mais par choix éclairé.",
-    lumiere:"Recommencement conscient, leadership amplifié, renouveau porteur.",
-    ombre:"Indécision au seuil du nouveau, tension entre ce qui finit et ce qui commence.",
-    vigilance:"Ce nouveau départ t'appartient. N'attends pas que tout soit parfait pour commencer." },
+    msg:"Le 10 porte l'élan du début, enrichi par le potentiel infini qui l'accompagne. C'est le retour au commencement, mais avec toute la maturité du voyage passé. Une nouvelle page s'ouvre — non par hasard, mais parce que tu es prêt. Ce que tu poses comme intention aujourd'hui a une puissance particulière.",
+    lumiere:"Recommencement éclairé, leadership amplifié, potentiel renouvelé.",
+    ombre:"Indécision face au nouveau départ, tension entre passé et avenir.",
+    vigilance:"Ce nouveau départ t'appartient entièrement. N'attends pas que tout soit parfait pour commencer." },
 
   { n:11, titre:"L'Illumination",
-    msg:"Le 11 est un nombre maître — il ne se réduit pas. Il vibre à haute fréquence, portant le don de l'intuition et de la lumière spirituelle. Ceux qui le reçoivent sont souvent des ponts entre les mondes.",
-    lumiere:"Intuition élevée, inspiration, conscience spirituelle, capacité à guider.",
-    ombre:"Anxiété, surcharge émotionnelle, sentiment d'être tiraillé entre deux mondes.",
-    vigilance:"Ta sensibilité est une lumière, pas une fragilité. Apprends à la protéger autant qu'à la partager." },
+    msg:"Le 11 est un nombre maître d'une grande puissance spirituelle. Il représente l'intuition élevée, l'inspiration et le don de percevoir ce que les autres ne voient pas encore. Ceux qui le portent sont souvent des guides, des âmes sensibles appelées à transmettre quelque chose de plus grand qu'elles.",
+    lumiere:"Intuition élevée, inspiration, dons spirituels, capacité à éclairer les autres.",
+    ombre:"Anxiété, surcharge émotionnelle, tension entre le monde spirituel et le quotidien.",
+    vigilance:"Ta sensibilité est une lumière précieuse. Apprends à la protéger autant qu'à la partager." },
 
   { n:12, titre:"Le Retournement",
-    msg:"Le 12 vibre à 3 (1+2). Il porte l'énergie créatrice du 3, passée par la dualité et le mouvement. Il invite à lâcher prise, à accepter qu'une pause ou un retournement soit parfois le chemin le plus juste.",
-    lumiere:"Adaptabilité, vision d'ensemble, créativité portée par l'expérience.",
-    ombre:"Indécision, dispersion, difficulté à choisir.",
-    vigilance:"Parfois ce qui ressemble à un obstacle est une invitation à regarder les choses autrement." },
+    msg:"Le 12 est le nombre des grands cycles — les 12 mois, les 12 signes. Il porte une énergie de créativité et d'adaptabilité, mais il invite surtout à accepter les tournants de la vie avec sagesse. Parfois ce qui ressemble à un obstacle est simplement une invitation à changer de perspective.",
+    lumiere:"Adaptabilité, créativité, vision d'ensemble, acceptation des cycles naturels.",
+    ombre:"Indécision, dispersion, difficulté à choisir une direction claire.",
+    vigilance:"Avant de décider, prends le temps de regarder la situation autrement. La bonne réponse est peut-être là où tu ne la cherchais pas." },
 
   { n:13, titre:"La Transformation",
-    msg:"Le 13 vibre à 4 (1+3). Ce nombre n'est pas la malchance — il est la mort symbolique de ce qui doit laisser la place. Ce qui se termine prépare l'espace d'une version plus libre de toi.",
-    lumiere:"Transformation profonde, persévérance, capacité à renaître plus fort.",
-    ombre:"Résistance au changement, peur de perdre ce qui est connu.",
-    vigilance:"Ce qui s'effondre en toi ne t'abandonne pas — il te libère. Fais confiance à ce processus." },
+    msg:"Le 13 est mal compris — ce n'est pas le nombre de la malchance, c'est celui de la renaissance. Il demande de laisser mourir ce qui est déjà terminé, pour que quelque chose de plus libre puisse prendre sa place. C'est un nombre de courage profond et de renouveau intérieur.",
+    lumiere:"Transformation, persévérance, renaissance, capacité à se renouveler en profondeur.",
+    ombre:"Résistance au changement, peur de perdre ce qui est connu, superstitions.",
+    vigilance:"Ce qui se termine en toi ne t'abandonne pas — il te libère. Fais confiance à ce processus, même quand il fait mal." },
 
   { n:14, titre:"La Tempérance",
-    msg:"Le 14 vibre à 5 (1+4). Il porte le mouvement du 5, mais temperé par la sagesse de la mesure. C'est l'invitation au juste équilibre, à laisser les choses se mêler avec patience et fluidité.",
-    lumiere:"Adaptabilité, liberté bien canalisée, capacité à s'ajuster sans perdre son axe.",
-    ombre:"Instabilité, tendance à se disperser, difficulté à s'engager.",
-    vigilance:"La liberté sans direction peut ressembler à de l'errance. Demande-toi ce qui mérite vraiment tes efforts." },
+    msg:"Le 14 est le nombre de l'adaptabilité et du mouvement, tempéré par la sagesse du juste milieu. Il invite à trouver l'équilibre entre les extrêmes, à agir sans précipitation, à laisser les choses se mettre en place à leur rythme naturel. La patience est ici une forme de sagesse.",
+    lumiere:"Adaptabilité, liberté bien canalisée, curiosité, capacité d'ajustement.",
+    ombre:"Instabilité, dispersion, difficulté à s'engager durablement.",
+    vigilance:"Le juste milieu n'est pas la médiocrité — c'est la sagesse. Trouve ton rythme et avance avec fluidité." },
 
   { n:15, titre:"L'Attachement",
-    msg:"Le 15 vibre à 6 (1+5). Il porte l'amour du 6 traversé par l'intensité du désir. Ce nombre invite à regarder en face ce qui t'attache — par amour ou par peur — et à faire la différence entre les deux.",
-    lumiere:"Sens de l'amour profond, harmonie, compassion, don pour la beauté.",
-    ombre:"Jalousie, possessivité, dépendance affective.",
-    vigilance:"L'amour vrai ne s'accroche pas — il fait confiance. Ce que tu portes t'allège-t-il ou t'alourdit-il ?" },
+    msg:"Le 15 est un nombre magnétique, tourné vers la beauté, l'harmonie et les relations profondes. Il porte une grande capacité d'amour, mais aussi une intensité qui peut mener à la dépendance. Il invite à distinguer ce qui t'attache par amour de ce qui t'attache par peur.",
+    lumiere:"Amour profond, sens de la beauté, harmonie, compassion dans les liens.",
+    ombre:"Jalousie, possessivité, dépendance affective, tendance à s'oublier dans l'autre.",
+    vigilance:"L'amour vrai laisse de l'espace. Ce que tu retiens trop fort finit par s'étouffer." },
 
   { n:16, titre:"L'Éclair",
-    msg:"Le 16 vibre à 7 (1+6). Il porte la profondeur du 7, précédée d'un choc ou d'une révélation. Ce qui tombe était peut-être fragile depuis longtemps. Ce qui reste après l'éclair est réel.",
-    lumiere:"Courage de voir la vérité, éveil spirituel, capacité à se reconstruire.",
-    ombre:"Illusions entretenues, arrogance, résistance aux vérités qui dérangent.",
-    vigilance:"Ce qui se bouleverse ne te détruit pas — il te recentre. Fais confiance à ce qui résiste après la tempête." },
+    msg:"Le 16 est le nombre de l'éveil soudain. Ce qui s'effondre était peut-être fragile depuis longtemps — l'éclair ne détruit pas, il révèle. Ce qui reste après est solide et vrai. Il t'invite à accepter ce qui se bouscule plutôt que d'y résister, car dans la rupture se cache souvent une libération.",
+    lumiere:"Éveil spirituel, courage de voir la vérité, capacité à se reconstruire après une rupture.",
+    ombre:"Arrogance, illusions entretenues, isolement, résistance aux vérités difficiles.",
+    vigilance:"Ce qui se brise aujourd'hui te fait de la place. Ce qui résiste est ce qui est réel." },
 
   { n:17, titre:"L'Étoile",
-    msg:"Le 17 vibre à 8 (1+7). Il porte la force de manifestation du 8, guidée par la lumière de l'étoile intérieure. Même après les épreuves, quelque chose en toi sait encore où aller.",
-    lumiere:"Résilience, persévérance, foi en l'avenir, capacité à transformer les épreuves.",
-    ombre:"Entêtement, auto-sabotage, résistance à l'aide.",
-    vigilance:"Ta force intérieure est réelle, mais elle n'est pas obligée de tout porter seule." },
+    msg:"Le 17 est le nombre de la résilience et de la foi. Même après les tempêtes les plus difficiles, il garde espoir et sait transformer les épreuves en force. C'est l'étoile qui brille dans la nuit — discrète mais constante. Quand le 17 se présente, rappelle-toi que la lumière est là, même si tu ne la vois pas encore.",
+    lumiere:"Résilience, persévérance, foi en l'avenir, force née de l'épreuve.",
+    ombre:"Entêtement, auto-sabotage, refus de demander de l'aide.",
+    vigilance:"Ta force intérieure est réelle, mais elle n'a pas à tout porter seule. Laisser quelqu'un t'aider n'est pas une faiblesse." },
 
   { n:18, titre:"L'Illusion",
-    msg:"Le 18 vibre à 9 (1+8). Il porte l'humanisme du 9, traversé par les eaux troubles de la Lune. C'est le nombre des profondeurs psychiques. Ce que tu ressens mérite d'être regardé avec douceur et honnêteté.",
-    lumiere:"Profondeur émotionnelle, compassion, intuition fine.",
-    ombre:"Confusion, peurs irrationnelles, tendance à se mentir à soi-même.",
-    vigilance:"Distingue ce qui vient de ton intuition et ce qui vient de ta peur. Ils ne t'emmènent pas au même endroit." },
+    msg:"Le 18 est le nombre des eaux profondes — peurs cachées, rêves qui parlent fort, émotions qui brouillent le regard. Il porte une grande sensibilité et une intuition puissante, mais aussi un risque de confusion entre ce qui est réel et ce que l'on s'imagine. Il invite à regarder honnêtement ce qui se passe en soi.",
+    lumiere:"Profondeur émotionnelle, intuition fine, compassion, capacité à percevoir ce qui est caché.",
+    ombre:"Confusion, peurs irrationnelles, auto-sabotage, tendance à l'illusion.",
+    vigilance:"Apprends à distinguer ce qui vient de ton intuition et ce qui vient de ta peur. Ils ne te guident pas vers le même endroit." },
 
   { n:19, titre:"Le Soleil",
-    msg:"Le 19 vibre à 1 (1+9). C'est le retour à l'élan du 1, enrichi de tout ce que le 9 a traversé. La renaissance lumineuse, le nouveau départ qui porte en lui la sagesse du chemin parcouru.",
-    lumiere:"Joie rayonnante, vitalité, succès issu de l'expérience, leadership lumineux.",
-    ombre:"Narcissisme, besoin de reconnaissance, difficulté à partager la lumière.",
-    vigilance:"Brille, mais sans oublier ceux qui sont dans l'ombre. Ta lumière est plus belle quand elle en éclaire d'autres." },
+    msg:"Le 19 est le nombre de la renaissance lumineuse. Il porte en lui à la fois l'élan du début et la sagesse de celui qui a tout traversé. C'est une belle énergie de joie, de réussite gagnée et de rayonnement sincère. Quand le 19 se présente, laisse ta lumière briller — elle est méritée.",
+    lumiere:"Joie, vitalité, succès issu de l'expérience, rayonnement bienveillant.",
+    ombre:"Narcissisme, besoin excessif de reconnaissance, immaturité émotionnelle.",
+    vigilance:"Brille — mais en illuminant aussi ceux qui sont dans l'ombre. La lumière partagée brûle plus longtemps." },
 
   { n:20, titre:"L'Éveil",
-    msg:"Le 20 vibre à 2 (2+0), amplifié par le potentiel du 0. Il porte la sensibilité du 2 avec une ouverture spirituelle décuplée. Quelque chose en toi entend un appel — oses-tu lui répondre ?",
-    lumiere:"Intuition amplifiée, sensibilité spirituelle, capacité à percevoir ce qui se passe vraiment.",
+    msg:"Le 20 est une énergie de sensibilité profonde et d'intuition décuplée. Quelque chose s'éveille, un appel intérieur se lève doucement. Il demande de lui prêter attention, même si tu ne comprends pas encore tout ce qu'il signifie. La coopération et l'écoute sont tes meilleurs alliés aujourd'hui.",
+    lumiere:"Intuition amplifiée, sensibilité spirituelle, coopération, capacité de médiation.",
     ombre:"Indécision, émotivité excessive, dépendance au regard des autres.",
     vigilance:"Ce que tu ressens profondément est une information précieuse. Fais-lui confiance, même sans pouvoir l'expliquer." },
 
   { n:21, titre:"L'Accomplissement",
-    msg:"Le 21 vibre à 3 (2+1). Il porte la joie créatrice du 3, après avoir traversé la dualité et l'action. C'est le nombre de l'accomplissement heureux. Quelque chose se complète — célèbre-le.",
-    lumiere:"Optimisme, créativité accomplie, charme naturel, capacité à rassembler.",
-    ombre:"Dispersion, impulsivité, difficulté à rester centré.",
-    vigilance:"La réussite est là — permets-toi de la voir sans la minimiser. Tu mérites de célébrer ce que tu as construit." },
+    msg:"Le 21 est le nombre de l'accomplissement joyeux. Il porte une créativité épanouie, un charme naturel et une capacité à rassembler les gens autour de projets beaux et vivants. Quelque chose se complète en toi aujourd'hui — accueille-le avec légèreté et célèbre ce que tu as accompli.",
+    lumiere:"Optimisme, créativité accomplie, charme, capacité à rassembler et à inspirer.",
+    ombre:"Dispersion, impulsivité, tendance à ne pas aller au fond des choses.",
+    vigilance:"Tu mérites de célébrer ce que tu as construit. Permets-toi de le voir vraiment." },
 
   { n:22, titre:"Le Maître Bâtisseur",
-    msg:"Le 22 est un nombre maître — il ne se réduit pas. C'est le Maître Bâtisseur, celui qui rend réels les rêves les plus grands. Ce que tu construis peut dépasser ton seul destin.",
-    lumiere:"Vision grandiose, pouvoir de manifestation, leadership altruiste.",
-    ombre:"Pression excessive sur soi-même, perfectionnisme paralysant.",
-    vigilance:"Tes rêves sont grands, et c'est juste. Mais avancer imparfaitement vaut mieux que rester immobile." },
+    msg:"Le 22 est le Maître Bâtisseur. Il possède le don rare de transformer les rêves les plus ambitieux en réalités concrètes. C'est un nombre d'une puissance immense qui porte une grande responsabilité. Ce que tu construis peut dépasser ton seul destin et toucher la vie de nombreuses personnes autour de toi.",
+    lumiere:"Vision grandiose, pouvoir de manifestation, leadership altruiste, détermination hors du commun.",
+    ombre:"Pression excessive sur soi-même, perfectionnisme paralysant, peur de l'échec.",
+    vigilance:"Tes rêves sont grands — c'est exactement comme ça doit être. Mais avancer imparfaitement vaut toujours mieux que rester immobile." },
 
   { n:23, titre:"La Grâce",
-    msg:"Le 23 vibre à 5 (2+3). Il porte la liberté adaptable du 5 avec un charme naturel. C'est un nombre de communication, de fluidité dans les échanges. Les liens que tu crées ont aujourd'hui une valeur particulière.",
-    lumiere:"Adaptabilité, communication naturelle, charme, capacité à créer du lien.",
-    ombre:"Inconstance, dispersion, manque de direction claire.",
+    msg:"Le 23 est un nombre de communication fluide et de liens qui s'ouvrent avec aisance. Il porte un charme naturel et une facilité à créer du lien avec les autres. Les portes s'ouvrent pour ceux qui avancent avec confiance et sincérité. Aujourd'hui, ta présence et tes mots ont une valeur toute particulière.",
+    lumiere:"Adaptabilité, communication naturelle, charme, facilité à créer du lien.",
+    ombre:"Inconstance, manque de direction, tendance à se disperser dans trop de directions.",
     vigilance:"Ton énergie sociale est un don, mais elle a besoin d'un cap. Vers quoi veux-tu vraiment t'orienter ?" },
 
   { n:24, titre:"L'Amour Actif",
-    msg:"Le 24 vibre à 6 (2+4). Il porte l'amour du 6, enraciné dans la stabilité. C'est le nombre du foyer et du lien qui se construit dans les gestes simples. L'amour vrai ne se déclare pas — il se prouve.",
-    lumiere:"Amour concret, fidélité, diplomatie, protection des êtres chers.",
-    ombre:"Surprotection, tendance à porter les fardeaux des autres.",
-    vigilance:"Aimer ne signifie pas tout contrôler. Laisse un peu d'espace dans tes liens — c'est là que l'amour respire." },
+    msg:"Le 24 est le nombre du foyer, des liens qui se construisent dans les petits gestes du quotidien. Il porte une énergie d'amour ancré dans la durée, la stabilité et la fidélité. L'amour vrai ne se déclare pas seulement en mots — il se prouve jour après jour, dans l'attention et la constance.",
+    lumiere:"Amour concret, fidélité, sens des responsabilités, protection des êtres chers.",
+    ombre:"Surprotection, tendance à porter les fardeaux des autres, difficulté à laisser l'autre être libre.",
+    vigilance:"Aimer ne signifie pas tout contrôler. Laisse un peu d'espace dans tes liens — c'est là que l'amour peut vraiment respirer." },
 
   { n:25, titre:"La Sagesse Intuitive",
-    msg:"Le 25 vibre à 7 (2+5). Il porte la profondeur silencieuse du 7 — celle qui fait confiance à ce qu'elle ressent avant même de pouvoir l'expliquer. C'est une invitation à ralentir, à écouter.",
-    lumiere:"Intuition profonde et fiable, sagesse intérieure, discernement spirituel.",
-    ombre:"Tendance à s'isoler dans ses pensées, doute de soi, mélancolie sourde.",
-    vigilance:"Ta sensibilité est un cadeau, pas une fragilité. Ce que tu perçois au fond de toi mérite d'être accueilli avec confiance." },
+    msg:"Le 25 est le nombre de celui qui perçoit avant de comprendre. C'est une énergie d'introspection profonde et de quête de vérité intérieure. Ceux qui le portent ont une sagesse naturelle et une manière unique de toucher à des vérités que les autres n'ont pas encore vues. Le silence leur parle.",
+    lumiere:"Intuition profonde, sagesse intérieure, discernement, sens de l'observation.",
+    ombre:"Tendance à s'isoler, doute de soi, mélancolie, attente d'être certain avant d'agir.",
+    vigilance:"Ce que tu perçois au fond de toi mérite d'être accueilli avec confiance. Ta sensibilité est un cadeau, pas une fragilité." },
 
   { n:26, titre:"Le Pouvoir Ancré",
-    msg:"Le 26 vibre à 8 (2+6). Il porte l'ambition du 8, canalisée dans la structure. C'est un nombre de construction matérielle et de leadership pragmatique. Ce que tu bâtis peut devenir quelque chose de solide.",
-    lumiere:"Discipline, détermination, sens pratique, capacité à organiser avec efficacité.",
-    ombre:"Rigidité, obsession du contrôle, froideur relationnelle.",
-    vigilance:"La structure est nécessaire, mais reste humain dans tes décisions. Le pouvoir qui dure est celui qui respecte." },
+    msg:"Le 26 est un nombre de construction sérieuse et de leadership pragmatique. Il allie ambition et discipline, et invite à bâtir avec méthode et intégrité. Tout ce que tu construis aujourd'hui avec honnêteté et rigueur peut devenir quelque chose de solide, de durable et de respecté.",
+    lumiere:"Discipline, détermination, sens pratique, capacité à organiser et à diriger.",
+    ombre:"Rigidité, obsession du contrôle, froideur dans les relations humaines.",
+    vigilance:"La structure est nécessaire, mais n'oublie pas de rester humain dans tes décisions. Le pouvoir qui dure est celui qui respecte." },
 
   { n:27, titre:"L'Inspiration",
-    msg:"Le 27 vibre à 9 (2+7). Il porte la compassion universelle du 9 avec une intuition profonde. C'est l'âme qui guide sans dominer, qui partage sans s'imposer. Ce que tu transmets peut toucher quelqu'un profondément.",
-    lumiere:"Altruisme, compassion, intuition spirituelle, capacité à inspirer.",
-    ombre:"Illusions, vulnérabilité aux énergies négatives, tendance à se perdre dans l'idéal.",
-    vigilance:"Tu portes une belle lumière — mais veille à ne pas t'oublier en la donnant. Prendre soin de toi est aussi une forme de service." },
+    msg:"Le 27 est le nombre de l'âme qui guide sans s'imposer, qui partage sa lumière avec douceur et générosité. Il porte une compassion universelle et une intuition spirituelle profonde. Ce que tu transmets aujourd'hui — même sans le savoir consciemment — peut toucher quelqu'un en profondeur.",
+    lumiere:"Altruisme, compassion, intuition spirituelle, capacité à inspirer et à guérir par la présence.",
+    ombre:"Illusions, vulnérabilité aux énergies des autres, tendance à se perdre dans l'idéal.",
+    vigilance:"Tu portes une belle lumière. Veille à ne pas t'oublier en la donnant — prendre soin de toi est aussi une forme de service." },
 
   { n:28, titre:"Le Chef Solitaire",
-    msg:"Le 28 vibre à 1 (2+8). C'est le retour à l'élan du 1, passé par la coopération et la puissance du 8. Un nombre d'ambition et de détermination — la réussite est possible, mais elle demande à la fois force et humilité.",
-    lumiere:"Ambition juste, détermination, capacité à mener avec intégrité.",
-    ombre:"Isolement, matérialisme, obstination.",
-    vigilance:"Ta force est réelle, mais elle gagne à s'ouvrir. Les meilleures réussites sont souvent construites avec d'autres." },
+    msg:"Le 28 est un nombre de force, d'initiative et de détermination. Il porte une ambition naturelle et une capacité à prendre la tête avec intégrité. Mais derrière cette puissance se cache parfois une solitude — celle de celui qui avance vite et qui oublie de laisser les autres le rejoindre.",
+    lumiere:"Ambition juste, détermination, initiative, capacité à mener avec intégrité.",
+    ombre:"Isolement, obstination, matérialisme, difficulté à accepter l'aide des autres.",
+    vigilance:"Ta force s'épanouit encore plus quand elle s'ouvre aux autres. Les plus belles réussites se construisent ensemble." },
 
   { n:29, titre:"L'Épreuve de la Foi",
-    msg:"Le 29 vibre à 11 (2+9), un nombre maître. Il porte la haute sensibilité du 11, traversée par des épreuves qui demandent une foi absolue. Ce qui te traverse a une raison d'être, même si elle n'est pas encore visible.",
-    lumiere:"Foi profonde, résilience, intuition spirituelle.",
-    ombre:"Émotions instables, mélancolie, tendance au pessimisme.",
-    vigilance:"Ce que tu vis en ce moment te transforme, même si tu ne le vois pas encore. Fais confiance au processus." },
+    msg:"Le 29 est un nombre maître de haute sensibilité qui porte à la fois une lumière spirituelle intense et des épreuves qui demandent une foi absolue. Ce que tu traverses en ce moment a une raison d'être, même si elle n'est pas encore visible. Quelque chose de plus grand est à l'œuvre dans ta vie.",
+    lumiere:"Foi profonde, résilience, intuition spirituelle, capacité à traverser l'adversité.",
+    ombre:"Émotions instables, mélancolie, tendance au pessimisme ou à dramatiser.",
+    vigilance:"Ce que tu vis te transforme, même si tu ne le vois pas encore. Fais confiance au processus — tu ressortiras de cette traversée plus libre et plus fort." },
 
   { n:30, titre:"La Créativité Pure",
-    msg:"Le 30 vibre à 3 (3+0), amplifié par le potentiel du 0. C'est l'expression créatrice portée à son comble, la joie qui veut être partagée. Ce qui veut naître en toi mérite de s'exprimer sans retenue.",
-    lumiere:"Créativité amplifiée, optimisme contagieux, joie de vivre et de partager.",
-    ombre:"Dispersion, insouciance, besoin excessif de validation.",
-    vigilance:"L'expression est belle — mais pense aussi à aller au bout. Ce qui est créé avec constance laisse une trace profonde." },
+    msg:"Le 30 est l'expression créatrice à son sommet, amplifiée par un potentiel sans limites. C'est la joie débordante qui cherche à être partagée, l'artiste qui veut donner au monde ce qu'il a en lui. Tout ce qui veut naître en toi mérite de s'exprimer aujourd'hui — sans retenue et sans censure.",
+    lumiere:"Créativité amplifiée, optimisme contagieux, joie de vivre, générosité dans le partage.",
+    ombre:"Dispersion, insouciance, besoin excessif d'attention et de validation.",
+    vigilance:"Exprimer est beau — mais aller au bout l'est encore plus. Ce qui est créé avec constance laisse une trace bien plus profonde." },
 
   { n:31, titre:"La Création Ancrée",
-    msg:"Le 31 vibre à 4 (3+1). Il porte l'énergie créatrice du 3, ancrée dans la discipline du 4. C'est l'artisan du sacré, celui qui transforme l'inspiration en quelque chose de durable.",
-    lumiere:"Créativité disciplinée, originalité, capacité à transformer les idées en réalité.",
-    ombre:"Perfectionnisme qui empêche de lancer, isolement, mélancolie.",
+    msg:"Le 31 est le nombre de l'artisan du sacré — celui qui transforme une inspiration en quelque chose de concret, de solide et de durable. Il marie la créativité et la discipline dans une union rare et puissante. Ce que tu fais avec tes mains et ton cœur porte une empreinte que personne d'autre ne peut créer à ta place.",
+    lumiere:"Créativité disciplinée, originalité, ambition constructive, sens du travail bien fait.",
+    ombre:"Perfectionnisme paralysant, isolement créateur, mélancolie face à l'idéal non atteint.",
     vigilance:"L'œuvre parfaite n'existe pas — mais l'œuvre faite avec amour, si. Lance-toi, même imparfaitement." },
 
   { n:32, titre:"La Parole Sacrée",
-    msg:"Le 32 vibre à 5 (3+2). Il porte la liberté et la communication du 5. C'est le nombre des ponts, des mots qui ouvrent des portes. Ce que tu dis aujourd'hui avec intention a un pouvoir particulier.",
-    lumiere:"Communication inspirée, adaptabilité, don pour tisser des liens par les mots.",
-    ombre:"Manipulation douce, instabilité, difficulté à s'engager.",
-    vigilance:"Tes mots ont du pouvoir — utilise-les avec soin. Ce qui est dit avec amour et clarté peut changer une vie." },
+    msg:"Le 32 est le nombre de ceux qui savent tisser des liens par les mots, ouvrir des portes avec les bonnes paroles au bon moment. Il porte une fluidité naturelle dans la communication et une grande adaptabilité. Ce que tu dis aujourd'hui avec intention et sincérité a un pouvoir réel sur ce qui t'entoure.",
+    lumiere:"Communication inspirée, adaptabilité, don pour les mots, capacité à créer des liens.",
+    ombre:"Instabilité, manipulation douce, difficulté à tenir ses engagements dans la durée.",
+    vigilance:"Tes mots ont du pouvoir — utilise-les avec soin et amour. Ce qui est dit avec clarté peut changer une relation, une situation, une vie." },
 
   { n:33, titre:"Le Maître Enseignant",
-    msg:"Le 33 est un nombre maître — il ne se réduit pas. C'est la vibration la plus haute de la compassion, celle qui enseigne par l'être. Ceux qui le portent ont une mission de lumière — guérir, élever, servir.",
-    lumiere:"Amour universel, guidance spirituelle, compassion totale, capacité à guérir.",
-    ombre:"Sacrifice destructeur, surcharge, impossibilité à décevoir.",
-    vigilance:"Tu es ici pour servir la lumière — mais pas au prix de t'éteindre. Prendre soin de toi est aussi sacré." }
+    msg:"Le 33 est le plus haut des nombres maîtres. Il porte la vibration la plus élevée de la compassion et du service désintéressé. Ceux qui le portent ont une mission de lumière — guérir, élever, enseigner non pas par les mots mais par ce qu'ils sont dans leur façon d'être au monde. C'est un nombre rare et profondément beau.",
+    lumiere:"Amour universel, guidance spirituelle, compassion totale, capacité à guérir et à élever.",
+    ombre:"Sacrifice destructeur, surcharge émotionnelle, impossibilité à décevoir, oubli de soi.",
+    vigilance:"Tu es ici pour servir la lumière — mais pas au prix de t'éteindre. Prendre soin de toi est aussi sacré que prendre soin des autres." }
 ];
 
 // ══════════════════════════════════════════════════════════
@@ -897,7 +929,9 @@ function resetDraw(){
 }
 
 function showResetBtn(){
-  document.getElementById('btnReset').style.display='inline-block';
+  const btn = document.getElementById('btnReset');
+  btn.style.removeProperty('display');
+  btn.style.display = 'block';
 }
 
 function getStoredDraw(){
@@ -980,6 +1014,7 @@ function showAlreadyDrawn(n){
     <div class="panel vigilance" style="border-radius:8px;padding:10px 13px;font-size:13px;line-height:1.55;margin-bottom:14px;">
       <span class="panel-label">⚠ Vigilance</span>${c.vigilance}</div>
     <div class="tomorrow-text" style="margin-bottom:14px;">Reviens demain pour un nouveau tirage 🌙</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:rgba(180,140,60,0.35);line-height:1.7;margin-bottom:16px;">Cet oracle est un outil de réflexion et d'inspiration personnelle. Il ne prétend pas détenir la vérité sur ta vie, tes choix ou ton avenir. Seul·e toi sais ce qui est juste pour toi. Si tu le souhaites, tu peux accueillir ce message comme une invitation à regarder en toi — non comme une certitude.</div>
     <a class="btn-rdv" href="https://www.sumupbookings.com/illumin-son" target="_blank" rel="noopener" style="margin-bottom:10px;">✦ &nbsp;Prendre rendez-vous&nbsp; ✦</a>
     <a class="btn-contact" href="https://www.linktree.com/illumineson" target="_blank" rel="noopener">Nous contacter</a>`;
   scene.appendChild(box);
@@ -990,12 +1025,10 @@ let started=false;
 function startSequence(){
   if(started) return;
   started=true;
-  const n=Math.floor(Math.random()*34);
-  storeDraw(n);
-  const c=CARTES[n];
 
-  // Injecter la face tirée
-  document.getElementById('cardFront').innerHTML = buildCardSVG(c, false);
+  // Masquer le disclaimer d'accueil
+  const da = document.getElementById('disclaimerAccueil');
+  if(da) da.style.display='none';
 
   document.getElementById('btnReveal').style.display='none';
   const etherText=document.getElementById('etherText');
@@ -1008,6 +1041,8 @@ function startSequence(){
     const totalDuration=5000, totalRotation=5*360+180;
     const startTime=performance.now();
     let lastSpark=0;
+    let cardRevealed=false; // tirage fait au moment du retournement
+
     function frame(now){
       const elapsed=now-startTime, t=Math.min(elapsed/totalDuration,1);
       const angle=customEase(t)*totalRotation;
@@ -1017,11 +1052,24 @@ function startSequence(){
       glow.style.boxShadow=`0 0 ${30+gi*40}px rgba(201,168,76,${gi*0.6})`;
       const sf=t<0.55?110:110+((t-0.55)/0.45)*500;
       if(now-lastSpark>sf&&t<0.96){spawnSpark();lastSpark=now;}
+
+      // Tirer la carte au moment exact du retournement (t ≈ 0.85)
+      if(!cardRevealed && t>=0.82){
+        cardRevealed=true;
+        const n=Math.floor(Math.random()*34);
+        storeDraw(n);
+        const c=CARTES[n];
+        document.getElementById('cardFront').innerHTML = buildCardSVG(c, false);
+        // stocker pour affichage après animation
+        card._carteData = c;
+      }
+
       if(t<1){ requestAnimationFrame(frame); }
       else {
         card.style.transform='rotateY(180deg)';
         glow.style.opacity='0';
         for(let i=0;i<16;i++) setTimeout(spawnSpark,i*55);
+        const c = card._carteData;
         setTimeout(()=>{
           document.getElementById('msgText').textContent=c.msg;
           document.getElementById('panLumiere').textContent=c.lumiere;
@@ -1031,6 +1079,7 @@ function startSequence(){
           document.getElementById('panels').classList.add('show');
           document.getElementById('ctaRow').classList.add('show');
           document.getElementById('tomorrowBox').classList.add('show');
+          document.getElementById('disclaimerBox').classList.add('show');
           showResetBtn();
         },800);
       }
