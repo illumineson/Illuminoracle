@@ -1251,9 +1251,7 @@ function startSequence(){
   const glow=document.getElementById('cardGlow');
 
   etherText.classList.add('visible');
-  setTimeout(()=>{
-    etherText.classList.remove('visible');
-    const totalDuration=5000, totalRotation=5*360+180;
+const totalDuration=5000, totalRotation=5*360+180;
     const startTime=performance.now();
     let lastSpark=0;
     let cardRevealed=false; // tirage fait au moment du retournement
@@ -1283,6 +1281,7 @@ function startSequence(){
       else {
         card.style.transform='rotateY(180deg)';
         glow.style.opacity='0';
+        etherText.classList.remove('visible');
         for(let i=0;i<16;i++) setTimeout(spawnSpark,i*55);
         const c = card._carteData;
         setTimeout(()=>{
@@ -1305,7 +1304,7 @@ function startSequence(){
       }
     }
     requestAnimationFrame(frame);
-  },1000);
+  
 }
 
 // ══════════════════════════════════════
