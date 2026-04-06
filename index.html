@@ -116,7 +116,7 @@
   .panel-row { display:flex; gap:12px; }
   .panel {
     flex:1; border-radius:8px; padding:14px 16px;
-    font-family:'Cormorant Garamond',serif; font-size:18px; line-height:1.65;
+    font-family:'Cormorant Garamond',serif; font-size:22px; line-height:1.65;
   }
   .panel-label {
     font-family:'Cinzel Decorative',serif; font-size:11px;
@@ -149,7 +149,7 @@
   /* ── Bouton partager ── */
   .btn-share {
     width:100%; font-family:'Cormorant Garamond',serif;
-    font-size:19px; font-weight:700; letter-spacing:0.1em; color:#c9a84c;
+    font-size:19px; letter-spacing:0.1em; color:#c9a84c;
     background:rgba(201,168,76,0.06);
     border:1px solid rgba(180,140,60,0.5);
     border-radius:4px; padding:14px 20px;
@@ -189,7 +189,7 @@
     text-align:center; margin-bottom:18px;
   }
   #shareCanvas .sh-msg {
-    font-style:italic; font-size:17px; line-height:1.8;
+    font-style:italic; font-size:15px; line-height:1.8;
     color:#ddd0b8; text-align:center; margin-bottom:22px;
     padding:0 8px;
   }
@@ -225,7 +225,7 @@
   .cta-row.show { opacity:1; pointer-events:all; }
   .btn-rdv {
     width:100%; font-family:'Cinzel Decorative',serif;
-    font-size:13px; font-weight:700; letter-spacing:0.18em; color:#06090f;
+    font-size:13px; letter-spacing:0.18em; color:#06090f;
     background:linear-gradient(135deg,#a07828,#c9a84c,#f0d080);
     border:none; border-radius:4px; padding:16px 20px;
     cursor:pointer; transition:all 0.3s; text-decoration:none;
@@ -234,7 +234,7 @@
   .btn-rdv:hover { opacity:0.88; transform:translateY(-1px); }
   .btn-contact {
     width:100%; font-family:'Cormorant Garamond',serif;
-    font-size:19px; font-weight:700; letter-spacing:0.1em; color:#c9a84c;
+    font-size:19px; letter-spacing:0.1em; color:#c9a84c;
     background:transparent; border:1px solid rgba(180,140,60,0.4);
     border-radius:4px; padding:14px 20px;
     cursor:pointer; transition:all 0.3s; text-decoration:none;
@@ -983,62 +983,60 @@ function mandalaSVG(){
   </g>`;
 }
 
-// ── Métatron dos de carte (identique à carte-accueil-metatron-final) ──
+// ── Métatron dos de carte — pointe à 12h, centré sur 125,188 ──
 function metatronDos(){
   return `
-  <!-- Lignes de connexion -->
-  <g stroke="rgba(201,168,76,0.30)" stroke-width="2" fill="none" transform="scale(0.8)" style="transform-origin:125px 188px;">
-    <line x1="125" y1="188" x2="159" y2="188"/><line x1="125" y1="188" x2="142" y2="158.56"/>
-    <line x1="125" y1="188" x2="108" y2="158.56"/><line x1="125" y1="188" x2="91" y2="188"/>
-    <line x1="125" y1="188" x2="108" y2="217.44"/><line x1="125" y1="188" x2="142" y2="217.44"/>
-    <line x1="125" y1="188" x2="193" y2="188"/><line x1="125" y1="188" x2="159" y2="129.12"/>
-    <line x1="125" y1="188" x2="91" y2="129.12"/><line x1="125" y1="188" x2="57" y2="188"/>
-    <line x1="125" y1="188" x2="91" y2="246.88"/><line x1="125" y1="188" x2="159" y2="246.88"/>
-    <line x1="159" y1="188" x2="142" y2="158.56"/><line x1="159" y1="188" x2="108" y2="158.56"/>
-    <line x1="159" y1="188" x2="91" y2="188"/><line x1="159" y1="188" x2="108" y2="217.44"/>
-    <line x1="159" y1="188" x2="142" y2="217.44"/><line x1="159" y1="188" x2="193" y2="188"/>
-    <line x1="159" y1="188" x2="159" y2="129.12"/><line x1="159" y1="188" x2="91" y2="129.12"/>
-    <line x1="159" y1="188" x2="57" y2="188"/><line x1="159" y1="188" x2="91" y2="246.88"/>
-    <line x1="159" y1="188" x2="159" y2="246.88"/><line x1="142" y1="158.56" x2="108" y2="158.56"/>
-    <line x1="142" y1="158.56" x2="91" y2="188"/><line x1="142" y1="158.56" x2="108" y2="217.44"/>
-    <line x1="142" y1="158.56" x2="142" y2="217.44"/><line x1="142" y1="158.56" x2="193" y2="188"/>
-    <line x1="142" y1="158.56" x2="159" y2="129.12"/><line x1="142" y1="158.56" x2="91" y2="129.12"/>
-    <line x1="142" y1="158.56" x2="57" y2="188"/><line x1="142" y1="158.56" x2="91" y2="246.88"/>
-    <line x1="142" y1="158.56" x2="159" y2="246.88"/><line x1="108" y1="158.56" x2="91" y2="188"/>
-    <line x1="108" y1="158.56" x2="108" y2="217.44"/><line x1="108" y1="158.56" x2="142" y2="217.44"/>
-    <line x1="108" y1="158.56" x2="193" y2="188"/><line x1="108" y1="158.56" x2="159" y2="129.12"/>
-    <line x1="108" y1="158.56" x2="91" y2="129.12"/><line x1="108" y1="158.56" x2="57" y2="188"/>
-    <line x1="108" y1="158.56" x2="91" y2="246.88"/><line x1="108" y1="158.56" x2="159" y2="246.88"/>
-    <line x1="91" y1="188" x2="108" y2="217.44"/><line x1="91" y1="188" x2="142" y2="217.44"/>
-    <line x1="91" y1="188" x2="193" y2="188"/><line x1="91" y1="188" x2="159" y2="129.12"/>
-    <line x1="91" y1="188" x2="91" y2="129.12"/><line x1="91" y1="188" x2="57" y2="188"/>
-    <line x1="91" y1="188" x2="91" y2="246.88"/><line x1="91" y1="188" x2="159" y2="246.88"/>
-    <line x1="108" y1="217.44" x2="142" y2="217.44"/><line x1="108" y1="217.44" x2="193" y2="188"/>
-    <line x1="108" y1="217.44" x2="159" y2="129.12"/><line x1="108" y1="217.44" x2="91" y2="129.12"/>
-    <line x1="108" y1="217.44" x2="57" y2="188"/><line x1="108" y1="217.44" x2="91" y2="246.88"/>
-    <line x1="108" y1="217.44" x2="159" y2="246.88"/><line x1="142" y1="217.44" x2="193" y2="188"/>
-    <line x1="142" y1="217.44" x2="159" y2="129.12"/><line x1="142" y1="217.44" x2="91" y2="129.12"/>
-    <line x1="142" y1="217.44" x2="57" y2="188"/><line x1="142" y1="217.44" x2="91" y2="246.88"/>
-    <line x1="142" y1="217.44" x2="159" y2="246.88"/><line x1="193" y1="188" x2="159" y2="129.12"/>
-    <line x1="193" y1="188" x2="91" y2="129.12"/><line x1="193" y1="188" x2="57" y2="188"/>
-    <line x1="193" y1="188" x2="91" y2="246.88"/><line x1="193" y1="188" x2="159" y2="246.88"/>
-    <line x1="159" y1="129.12" x2="91" y2="129.12"/><line x1="159" y1="129.12" x2="57" y2="188"/>
-    <line x1="159" y1="129.12" x2="91" y2="246.88"/><line x1="159" y1="129.12" x2="159" y2="246.88"/>
-    <line x1="91" y1="129.12" x2="57" y2="188"/><line x1="91" y1="129.12" x2="91" y2="246.88"/>
-    <line x1="91" y1="129.12" x2="159" y2="246.88"/><line x1="57" y1="188" x2="91" y2="246.88"/>
-    <line x1="57" y1="188" x2="159" y2="246.88"/><line x1="91" y1="246.88" x2="159" y2="246.88"/>
-  </g>
-  <!-- 13 cercles -->
-  <g stroke="rgba(201,168,76,0.30)" stroke-width="2" fill="none" transform="scale(0.8)" style="transform-origin:125px 188px;">
-    <circle cx="125" cy="188" r="17"/><circle cx="159" cy="188" r="17"/>
-    <circle cx="142" cy="158.56" r="17"/><circle cx="108" cy="158.56" r="17"/>
-    <circle cx="91" cy="188" r="17"/><circle cx="108" cy="217.44" r="17"/>
-    <circle cx="142" cy="217.44" r="17"/><circle cx="193" cy="188" r="17"/>
-    <circle cx="159" cy="129.12" r="17"/><circle cx="91" cy="129.12" r="17"/>
-    <circle cx="57" cy="188" r="17"/><circle cx="91" cy="246.88" r="17"/>
-    <circle cx="159" cy="246.88" r="17"/>
-  </g>
-  <circle cx="125" cy="188" r="1.8" fill="#f5e098" opacity="0.90" transform="scale(0.8)" style="transform-origin:125px 188px;"/>`;
+  <g transform="translate(125,188) rotate(-30) scale(0.8) translate(-125,-188)">
+    <g stroke="rgba(201,168,76,0.30)" stroke-width="2" fill="none">
+      <line x1="125" y1="188" x2="159" y2="188"/><line x1="125" y1="188" x2="142" y2="158.56"/>
+      <line x1="125" y1="188" x2="108" y2="158.56"/><line x1="125" y1="188" x2="91" y2="188"/>
+      <line x1="125" y1="188" x2="108" y2="217.44"/><line x1="125" y1="188" x2="142" y2="217.44"/>
+      <line x1="125" y1="188" x2="193" y2="188"/><line x1="125" y1="188" x2="159" y2="129.12"/>
+      <line x1="125" y1="188" x2="91" y2="129.12"/><line x1="125" y1="188" x2="57" y2="188"/>
+      <line x1="125" y1="188" x2="91" y2="246.88"/><line x1="125" y1="188" x2="159" y2="246.88"/>
+      <line x1="159" y1="188" x2="142" y2="158.56"/><line x1="159" y1="188" x2="108" y2="158.56"/>
+      <line x1="159" y1="188" x2="91" y2="188"/><line x1="159" y1="188" x2="108" y2="217.44"/>
+      <line x1="159" y1="188" x2="142" y2="217.44"/><line x1="159" y1="188" x2="193" y2="188"/>
+      <line x1="159" y1="188" x2="159" y2="129.12"/><line x1="159" y1="188" x2="91" y2="129.12"/>
+      <line x1="159" y1="188" x2="57" y2="188"/><line x1="159" y1="188" x2="91" y2="246.88"/>
+      <line x1="159" y1="188" x2="159" y2="246.88"/><line x1="142" y1="158.56" x2="108" y2="158.56"/>
+      <line x1="142" y1="158.56" x2="91" y2="188"/><line x1="142" y1="158.56" x2="108" y2="217.44"/>
+      <line x1="142" y1="158.56" x2="142" y2="217.44"/><line x1="142" y1="158.56" x2="193" y2="188"/>
+      <line x1="142" y1="158.56" x2="159" y2="129.12"/><line x1="142" y1="158.56" x2="91" y2="129.12"/>
+      <line x1="142" y1="158.56" x2="57" y2="188"/><line x1="142" y1="158.56" x2="91" y2="246.88"/>
+      <line x1="142" y1="158.56" x2="159" y2="246.88"/><line x1="108" y1="158.56" x2="91" y2="188"/>
+      <line x1="108" y1="158.56" x2="108" y2="217.44"/><line x1="108" y1="158.56" x2="142" y2="217.44"/>
+      <line x1="108" y1="158.56" x2="193" y2="188"/><line x1="108" y1="158.56" x2="159" y2="129.12"/>
+      <line x1="108" y1="158.56" x2="91" y2="129.12"/><line x1="108" y1="158.56" x2="57" y2="188"/>
+      <line x1="108" y1="158.56" x2="91" y2="246.88"/><line x1="108" y1="158.56" x2="159" y2="246.88"/>
+      <line x1="91" y1="188" x2="108" y2="217.44"/><line x1="91" y1="188" x2="142" y2="217.44"/>
+      <line x1="91" y1="188" x2="193" y2="188"/><line x1="91" y1="188" x2="159" y2="129.12"/>
+      <line x1="91" y1="188" x2="91" y2="129.12"/><line x1="91" y1="188" x2="57" y2="188"/>
+      <line x1="91" y1="188" x2="91" y2="246.88"/><line x1="91" y1="188" x2="159" y2="246.88"/>
+      <line x1="108" y1="217.44" x2="142" y2="217.44"/><line x1="108" y1="217.44" x2="193" y2="188"/>
+      <line x1="108" y1="217.44" x2="159" y2="129.12"/><line x1="108" y1="217.44" x2="91" y2="129.12"/>
+      <line x1="108" y1="217.44" x2="57" y2="188"/><line x1="108" y1="217.44" x2="91" y2="246.88"/>
+      <line x1="108" y1="217.44" x2="159" y2="246.88"/><line x1="142" y1="217.44" x2="193" y2="188"/>
+      <line x1="142" y1="217.44" x2="159" y2="129.12"/><line x1="142" y1="217.44" x2="91" y2="129.12"/>
+      <line x1="142" y1="217.44" x2="57" y2="188"/><line x1="142" y1="217.44" x2="91" y2="246.88"/>
+      <line x1="142" y1="217.44" x2="159" y2="246.88"/><line x1="193" y1="188" x2="159" y2="129.12"/>
+      <line x1="193" y1="188" x2="91" y2="129.12"/><line x1="193" y1="188" x2="57" y2="188"/>
+      <line x1="193" y1="188" x2="91" y2="246.88"/><line x1="193" y1="188" x2="159" y2="246.88"/>
+      <line x1="159" y1="129.12" x2="91" y2="129.12"/><line x1="159" y1="129.12" x2="57" y2="188"/>
+      <line x1="159" y1="129.12" x2="91" y2="246.88"/><line x1="159" y1="129.12" x2="159" y2="246.88"/>
+      <line x1="91" y1="129.12" x2="57" y2="188"/><line x1="91" y1="129.12" x2="91" y2="246.88"/>
+      <line x1="91" y1="129.12" x2="159" y2="246.88"/><line x1="57" y1="188" x2="91" y2="246.88"/>
+      <line x1="57" y1="188" x2="159" y2="246.88"/><line x1="91" y1="246.88" x2="159" y2="246.88"/>
+      <circle cx="125" cy="188" r="17"/><circle cx="159" cy="188" r="17"/>
+      <circle cx="142" cy="158.56" r="17"/><circle cx="108" cy="158.56" r="17"/>
+      <circle cx="91" cy="188" r="17"/><circle cx="108" cy="217.44" r="17"/>
+      <circle cx="142" cy="217.44" r="17"/><circle cx="193" cy="188" r="17"/>
+      <circle cx="159" cy="129.12" r="17"/><circle cx="91" cy="129.12" r="17"/>
+      <circle cx="57" cy="188" r="17"/><circle cx="91" cy="246.88" r="17"/>
+      <circle cx="159" cy="246.88" r="17"/>
+    </g>
+    <circle cx="125" cy="188" r="1.8" fill="#f5e098" opacity="0.90"/>
+  </g>`;
 }
 
 function buildCardSVG(carte, isDos=false){
