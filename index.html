@@ -1208,31 +1208,31 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 function showAlreadyDrawn(n){
-  const c=CARTES[n];
-  // Injecter la face tirée dans la carte existante et la retourner
+  const c = CARTES[n];
+
+  // Carte retournée
   document.getElementById('cardFront').innerHTML = buildCardSVG(c, false);
   document.getElementById('cardSpin').style.transform = 'rotateY(180deg)';
-  document.getElementById('btnReveal').style.display='none';
-  document.getElementById('etherText').style.display='none';
-  const scene=document.getElementById('scene');
-  const box=document.createElement('div');
-  box.className='already-box';
-  box.innerHTML=`
-    <div class="already-title">Ta carte du jour</div>
-    <div class="already-text">${c.msg}</div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
-      <div class="panel lumiere" style="flex:1;min-width:120px;border-radius:8px;padding:10px 13px;font-size:13px;line-height:1.55;">
-        <span class="panel-label">✦ Lumière</span>${c.lumiere}</div>
-      <div class="panel ombre" style="flex:1;min-width:120px;border-radius:8px;padding:10px 13px;font-size:13px;line-height:1.55;">
-        <span class="panel-label">◆ Ombre</span>${c.ombre}</div>
-    </div>
-    <div class="panel vigilance" style="border-radius:8px;padding:10px 13px;font-size:13px;line-height:1.55;margin-bottom:14px;">
-      <span class="panel-label">⚠ Vigilance</span>${c.vigilance}</div>
-    <div class="tomorrow-text" style="margin-bottom:14px;">Reviens demain pour un nouveau tirage 🌙</div>
-    <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:rgba(180,140,60,0.35);line-height:1.7;margin-bottom:16px;">Cet oracle est un outil de réflexion et d'inspiration personnelle. Il ne prétend pas détenir la vérité sur ta vie, tes choix ou ton avenir. Seul·e toi sais ce qui est juste pour toi. Si tu le souhaites, tu peux accueillir ce message comme une invitation à regarder en toi — non comme une certitude.</div>
-    <a class="btn-rdv" href="https://www.sumupbookings.com/illumin-son" target="_blank" rel="noopener" style="margin-bottom:10px;">✦ &nbsp;Prendre rendez-vous&nbsp; ✦</a>
-    <a class="btn-contact" href="https://www.linktree.com/illumineson" target="_blank" rel="noopener">Nous contacter</a>`;
-  scene.appendChild(box);
+
+  // Masquer bouton et éther
+  document.getElementById('btnReveal').style.display = 'none';
+  document.getElementById('etherText').style.display = 'none';
+  document.getElementById('disclaimerAccueil').style.display = 'none';
+
+  // Remplir et afficher tous les blocs exactement comme après un tirage
+  document.getElementById('cardDate').textContent = formatDateFR();
+  document.getElementById('cardDate').classList.add('show');
+  document.getElementById('cardTitre').textContent = `${c.n} — ${c.titre}`;
+  document.getElementById('cardTitre').classList.add('show');
+  document.getElementById('msgText').textContent = c.msg;
+  document.getElementById('msgBox').classList.add('show');
+  document.getElementById('panLumiere').textContent = c.lumiere;
+  document.getElementById('panOmbre').textContent = c.ombre;
+  document.getElementById('panVigilance').textContent = c.vigilance;
+  document.getElementById('panels').classList.add('show');
+  document.getElementById('ctaRow').classList.add('show');
+  document.getElementById('tomorrowBox').classList.add('show');
+  document.getElementById('disclaimerBox').classList.add('show');
   showResetBtn();
 }
 
