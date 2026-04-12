@@ -165,58 +165,118 @@
   }
   .btn-share:hover { background:rgba(180,140,60,0.12); border-color:#c9a84c; }
 
-  /* ── Zone de capture pour partage (hors écran) ── */
+  /* ── Zone de capture story 1080×1920 (hors écran) ── */
   #shareCanvas {
     position:fixed; left:-9999px; top:0;
-    width:420px;
+    width:1080px; height:1920px;
     background: linear-gradient(160deg,#04080f 0%,#0a1535 50%,#081028 100%);
-    padding:40px 28px 36px;
     font-family:'Cormorant Garamond',serif;
     color:#ddd0b8;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    padding:100px 80px;
+    overflow:hidden;
   }
+
+  /* Mandala filigrane centré */
+  #shareCanvas .sh-mandala {
+    position:absolute; top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    opacity:0.07; pointer-events:none;
+  }
+
+  /* Liseré décoratif intérieur */
+  #shareCanvas .sh-border {
+    position:absolute; inset:32px;
+    border:1px solid rgba(201,168,76,0.22);
+    border-radius:24px; pointer-events:none;
+  }
+  #shareCanvas .sh-border-outer {
+    position:absolute; inset:18px;
+    border:1px solid rgba(201,168,76,0.10);
+    border-radius:30px; pointer-events:none;
+  }
+
+  /* Équerres coins */
+  #shareCanvas .sh-corner {
+    position:absolute; width:48px; height:48px;
+    border-color:rgba(201,168,76,0.55); border-style:solid;
+  }
+  #shareCanvas .sh-corner-tl { top:48px; left:48px; border-width:2px 0 0 2px; }
+  #shareCanvas .sh-corner-tr { top:48px; right:48px; border-width:2px 2px 0 0; }
+  #shareCanvas .sh-corner-bl { bottom:48px; left:48px; border-width:0 0 2px 2px; }
+  #shareCanvas .sh-corner-br { bottom:48px; right:48px; border-width:0 2px 2px 0; }
+
+  #shareCanvas .sh-content {
+    position:relative; z-index:2;
+    display:flex; flex-direction:column; align-items:center;
+    width:100%; gap:0;
+  }
+
   #shareCanvas .sh-logo {
-    font-family:'Cinzel Decorative',serif; font-size:18px;
-    letter-spacing:0.14em; color:#c9a84c; text-align:center; margin-bottom:4px;
+    font-family:'Cinzel Decorative',serif; font-size:52px;
+    letter-spacing:0.14em; color:#c9a84c; text-align:center;
+    margin-bottom:12px;
   }
   #shareCanvas .sh-sub {
-    font-family:'Cormorant Garamond',serif; font-size:13px;
-    letter-spacing:0.3em; color:rgba(180,140,60,0.5);
-    text-transform:uppercase; text-align:center; margin-bottom:20px;
+    font-family:'Cormorant Garamond',serif; font-size:28px;
+    letter-spacing:0.35em; color:rgba(180,140,60,0.5);
+    text-transform:uppercase; text-align:center; margin-bottom:60px;
+  }
+  #shareCanvas .sh-divline {
+    width:160px; height:1px; margin-bottom:60px;
+    background:linear-gradient(90deg,transparent,rgba(180,140,60,0.55),transparent);
   }
   #shareCanvas .sh-card {
-    display:flex; justify-content:center; margin-bottom:20px;
+    display:flex; justify-content:center; margin-bottom:60px;
+  }
+  /* Carte agrandie ×2.2 */
+  #shareCanvas .sh-card svg {
+    width:550px !important; height:825px !important;
   }
   #shareCanvas .sh-date {
     font-family:'Cormorant Garamond',serif; font-style:italic;
-    font-size:16px; letter-spacing:0.12em; color:rgba(201,168,76,0.65);
-    text-align:center; margin-bottom:8px;
+    font-size:32px; letter-spacing:0.14em; color:rgba(201,168,76,0.65);
+    text-align:center; margin-bottom:16px;
   }
   #shareCanvas .sh-titre {
-    font-family:'Cinzel Decorative',serif; font-size:12px;
-    letter-spacing:0.18em; color:#c9a84c;
-    text-align:center; margin-bottom:18px;
+    font-family:'Cinzel Decorative',serif; font-size:30px;
+    letter-spacing:0.2em; color:#c9a84c;
+    text-align:center; margin-bottom:52px;
+  }
+  #shareCanvas .sh-divline2 {
+    width:120px; height:1px; margin-bottom:52px;
+    background:linear-gradient(90deg,transparent,rgba(180,140,60,0.4),transparent);
   }
   #shareCanvas .sh-msg {
-    font-style:italic; font-size:15px; line-height:1.8;
-    color:#ddd0b8; text-align:center; margin-bottom:22px;
-    padding:0 8px;
+    font-style:italic; font-size:34px; line-height:1.85;
+    color:#ddd0b8; text-align:center; margin-bottom:64px;
+    padding:0 20px; max-width:900px;
   }
-  #shareCanvas .sh-panel {
-    border-radius:8px; padding:12px 16px;
-    font-size:14px; line-height:1.55; margin-bottom:10px;
+  /* Ligne des 3 mots forts */
+  #shareCanvas .sh-mots {
+    display:flex; align-items:center; justify-content:center;
+    gap:32px; margin-bottom:72px;
   }
-  #shareCanvas .sh-panel-label {
-    font-family:'Cinzel Decorative',serif; font-size:8px;
-    letter-spacing:0.28em; display:block; margin-bottom:5px;
-    opacity:0.85; font-weight:700;
+  #shareCanvas .sh-mot-lum {
+    font-family:'Cinzel Decorative',serif; font-size:24px;
+    letter-spacing:0.18em; color:#d4b96a;
   }
-  #shareCanvas .sh-lum { background:rgba(201,168,76,0.1);  border:0.5px solid rgba(201,168,76,0.3); color:#d4b96a; }
-  #shareCanvas .sh-omb { background:rgba(80,40,10,0.25);   border:0.5px solid rgba(180,100,40,0.3); color:#b07840; }
-  #shareCanvas .sh-vig { background:rgba(30,25,55,0.4);    border:0.5px solid rgba(140,110,180,0.3); color:#b8a8d0; font-style:italic; }
+  #shareCanvas .sh-mot-omb {
+    font-family:'Cinzel Decorative',serif; font-size:24px;
+    letter-spacing:0.18em; color:#b07840;
+  }
+  #shareCanvas .sh-mot-vig {
+    font-family:'Cinzel Decorative',serif; font-size:24px;
+    letter-spacing:0.18em; color:#b8a8d0; font-style:italic;
+  }
+  #shareCanvas .sh-sep {
+    color:rgba(201,168,76,0.3); font-size:28px;
+  }
   #shareCanvas .sh-footer {
-    font-family:'Cinzel Decorative',serif; font-size:9px;
-    letter-spacing:0.2em; color:rgba(180,140,60,0.4);
-    text-align:center; margin-top:24px;
+    font-family:'Cinzel Decorative',serif; font-size:22px;
+    letter-spacing:0.22em; color:rgba(180,140,60,0.35);
+    text-align:center;
   }
 
   .cta-row {
@@ -1610,7 +1670,80 @@ function startSequence(){
 }
 
 // ══════════════════════════════════════════════════════════
-// PARTAGE
+// MOTS FORTS — 1 mot par panneau, par carte, par variante
+// Structure : MOTS[n] = [ [lumA,ombreA,vigilA], [lumB,ombreB,vigilB], [lumC,ombreC,vigilC] ]
+// ══════════════════════════════════════════════════════════
+const MOTS = [
+  [["Potentiel","Inertie","Présence"],       ["Disponibilité","Accrochage","Confiance"],  ["Légèreté","Flottement","Patience"]],
+  [["Leadership","Impatience","Écoute"],     ["Initiative","Précipitation","Alignement"], ["Clarté","Isolement","Partage"]],
+  [["Diplomatie","Effacement","Vérité"],     ["Sensibilité","Abandon","Honnêteté"],       ["Ouverture","Dépendance","Réciprocité"]],
+  [["Créativité","Dispersion","Direction"],  ["Authenticité","Censure","Permission"],     ["Légèreté","Agitation","Nourriture"]],
+  [["Solidité","Rigidité","Souplesse"],      ["Constance","Contrôle","Action"],           ["Fiabilité","Fardeau","Renouveau"]],
+  [["Aventure","Impulsivité","Ancrage"],     ["Vitalité","Fuite","Direction"],             ["Expérience","Dispersion","Intégration"]],
+  [["Compassion","Sacrifice","Équilibre"],   ["Douceur","Oubli","Limites"],               ["Réconciliation","Évitement","Authenticité"]],
+  [["Sagesse","Isolement","Partage"],        ["Honnêteté","Paralysie","Décision"],        ["Profondeur","Incompréhension","Mouvement"]],
+  [["Ambition","Matérialisme","Intégrité"],  ["Confiance","Autosabotage","Commencement"], ["Vision","Rigidité","Service"]],
+  [["Compassion","Amertume","Gratitude"],    ["Lâcher-prise","Attachement","Libération"], ["Générosité","Sacrifice","Réception"]],
+  [["Recommencement","Indécision","Permission"],["Maturité","Pression","Nouveauté"],      ["Intention","Doute","Incarnation"]],
+  [["Intuition","Anxiété","Protection"],     ["Perception","Épuisement","Limites"],       ["Clarté","Doute","Confiance"]],
+  [["Adaptabilité","Dispersion","Perspective"],["Patience","Blocage","Recul"],            ["Humilité","Résignation","Discernement"]],
+  [["Renaissance","Résistance","Confiance"], ["Courage","Accrochage","Métamorphose"],     ["Résilience","Répétition","Nouveauté"]],
+  [["Équilibre","Dispersion","Fluidité"],    ["Alchimie","Indécision","Ajustement"],      ["Précision","Contrôle","Conscience"]],
+  [["Amour","Jalousie","Espace"],            ["Profondeur","Possession","Liberté"],       ["Fidélité","Idéalisation","Clarté"]],
+  [["Éveil","Résistance","Vérité"],          ["Clarté","Effondrement","Fondation"],       ["Honnêteté","Illusion","Regard"]],
+  [["Résilience","Entêtement","Aide"],       ["Constance","Isolement","Lumière"],         ["Foi","Pessimisme","Confiance"]],
+  [["Intuition","Confusion","Discernement"], ["Empathie","Projection","Vérification"],   ["Conscience","Fuite","Courage"]],
+  [["Rayonnement","Narcissisme","Partage"],  ["Renouveau","Méfiance","Réception"],        ["Maturité","Validation","Intériorité"]],
+  [["Intuition","Indécision","Confiance"],   ["Honnêteté","Résistance","Écoute"],         ["Clarté","Paralysie","Intériorité"]],
+  [["Épanouissement","Dispersion","Célébration"],["Maturité","Insatisfaction","Reconnaissance"],["Satisfaction","Perfectionnisme","Permission"]],
+  [["Vision","Perfectionnisme","Mouvement"], ["Ambition","Isolement","Partage"],          ["Manifestation","Procrastination","Commencement"]],
+  [["Fluidité","Inconstance","Cap"],         ["Légèreté","Évitement","Traversée"],        ["Confiance","Passivité","Action"]],
+  [["Fidélité","Surprotection","Espace"],    ["Constance","Ressentiment","Expression"],   ["Profondeur","Évitement","Dialogue"]],
+  [["Discernement","Isolement","Incarnation"],["Connaissance","Doute","Silence"],         ["Profondeur","Rumination","Action"]],
+  [["Intégrité","Rigidité","Humanité"],      ["Cohérence","Jugement","Souplesse"],        ["Alignement","Imposition","Élévation"]],
+  [["Compassion","Illusion","Protection"],   ["Présence","Minimisation","Légitimité"],    ["Écoute","Absorption","Accompagnement"]],
+  [["Détermination","Isolement","Ouverture"],["Courage","Solitude","Vulnérabilité"],      ["Force","Dureté","Connexion"]],
+  [["Résilience","Mélancolie","Transformation"],["Profondeur","Épuisement","Construction"],["Persévérance","Découragement","Mémoire"]],
+  [["Joie","Validation","Constance"],        ["Spontanéité","Sérieux","Cultivation"],     ["Originalité","Comparaison","Valeur"]],
+  [["Artisanat","Perfectionnisme","Amour"],  ["Soin","Autocritique","Confiance"],         ["Authenticité","Isolement","Partage"]],
+  [["Communication","Instabilité","Clarté"], ["Conscience","Séduction","Engagement"],     ["Courage","Évitement","Douceur"]],
+  [["Compassion","Sacrifice","Soin"],        ["Rayonnement","Doute","Authenticité"],      ["Pardon","Fermeture","Concret"]]
+];
+
+function getMotsForts(n, v){
+  const m = MOTS[n]?.[v] ?? MOTS[n]?.[0] ?? ["—","—","—"];
+  return { lum: m[0], omb: m[1], vig: m[2] };
+}
+
+// ══════════════════════════════════════════════════════════
+// MANDALA SVG STATIQUE (filigrane story)
+// ══════════════════════════════════════════════════════════
+function mandalaSVGStatic(cx, cy, scale=1){
+  const s = scale;
+  const r = (v) => v * s;
+  return `<svg width="${r(1080)}" height="${r(1080)}" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.08;">
+    <g fill="none" stroke="rgba(201,168,76,1)" stroke-width="1.2">
+      <circle cx="540" cy="540" r="440"/>
+      <circle cx="540" cy="540" r="380"/>
+      <circle cx="540" cy="540" r="300"/>
+      <circle cx="540" cy="540" r="220"/>
+      <circle cx="540" cy="540" r="140"/>
+      ${Array.from({length:12},(_,i)=>{
+        const a=i*30*Math.PI/180;
+        return `<line x1="540" y1="540" x2="${(540+440*Math.cos(a)).toFixed(1)}" y2="${(540+440*Math.sin(a)).toFixed(1)}"/>`;
+      }).join('')}
+      ${Array.from({length:16},(_,i)=>{
+        const a=i*22.5*Math.PI/180, r1=300, r2=380;
+        const x1=(540+r1*Math.cos(a)).toFixed(1), y1=(540+r1*Math.sin(a)).toFixed(1);
+        const x2=(540+r2*Math.cos(a)).toFixed(1), y2=(540+r2*Math.sin(a)).toFixed(1);
+        return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+      }).join('')}
+    </g>
+  </svg>`;
+}
+
+// ══════════════════════════════════════════════════════════
+// PARTAGE — Story 1080×1920
 // ══════════════════════════════════════════════════════════
 async function partagerCarte(){
   const btn=document.getElementById('btnShare');
@@ -1623,37 +1756,60 @@ async function partagerCarte(){
   const c=CARTES[stored.n];
   const v=stored.v ?? 0;
   const txt=getVariante(c,v);
+  const mots=getMotsForts(stored.n, v);
   const dateFR=formatDateFR();
 
+  // SVG carte agrandi ×2.2
   const cardFrontEl=document.getElementById('cardFront');
   const cardSvgHTML=cardFrontEl ? cardFrontEl.innerHTML : '';
 
   const zone=document.getElementById('shareCanvas');
   zone.innerHTML=`
-    <div class="sh-logo">Illumin&amp;Son</div>
-    <div class="sh-sub">Oracle du Jour</div>
-    <div class="sh-card">${cardSvgHTML}</div>
-    <div class="sh-date">${dateFR}</div>
-    <div class="sh-titre">${c.n} — ${c.titre.toUpperCase()}</div>
-    <div class="sh-msg">${txt.msg}</div>
-    <div class="sh-panel sh-lum"><span class="sh-panel-label">✦ LUMIÈRE</span>${txt.lumiere}</div>
-    <div class="sh-panel sh-omb"><span class="sh-panel-label">◆ OMBRE</span>${txt.ombre}</div>
-    <div class="sh-panel sh-vig"><span class="sh-panel-label">⚠ VIGILANCE</span>${txt.vigilance}</div>
-    <div class="sh-footer">illumineson.github.io/Illuminoracle</div>
+    ${mandalaSVGStatic(540,540)}
+    <div class="sh-border-outer"></div>
+    <div class="sh-border"></div>
+    <div class="sh-corner sh-corner-tl"></div>
+    <div class="sh-corner sh-corner-tr"></div>
+    <div class="sh-corner sh-corner-bl"></div>
+    <div class="sh-corner sh-corner-br"></div>
+    <div class="sh-content">
+      <div class="sh-logo">Illumin&amp;Son</div>
+      <div class="sh-sub">Oracle du Jour</div>
+      <div class="sh-divline"></div>
+      <div class="sh-card">${cardSvgHTML}</div>
+      <div class="sh-date">${dateFR}</div>
+      <div class="sh-titre">${c.n} — ${c.titre.toUpperCase()}</div>
+      <div class="sh-divline2"></div>
+      <div class="sh-msg">${txt.msg}</div>
+      <div class="sh-mots">
+        <span class="sh-mot-lum">✦ ${mots.lum}</span>
+        <span class="sh-sep">·</span>
+        <span class="sh-mot-omb">◆ ${mots.omb}</span>
+        <span class="sh-sep">·</span>
+        <span class="sh-mot-vig">⚠ ${mots.vig}</span>
+      </div>
+      <div class="sh-footer">illumineson.github.io/Illuminoracle</div>
+    </div>
   `;
 
   await document.fonts.ready;
 
   try {
     const canvas=await html2canvas(zone,{
-      backgroundColor:'#04080f', scale:2, useCORS:true, logging:false, windowWidth:420
+      backgroundColor:'#04080f',
+      scale:1,
+      useCORS:true,
+      logging:false,
+      windowWidth:1080,
+      width:1080,
+      height:1920
     });
     const dataUrl=canvas.toDataURL('image/png');
 
     if(navigator.share){
       try{
         const blob=await (await fetch(dataUrl)).blob();
-        const file=new File([blob],'oracle-illuminson.png',{type:'image/png'});
+        const file=new File([blob],'oracle-illuminson-story.png',{type:'image/png'});
         if(navigator.canShare && navigator.canShare({files:[file]})){
           await navigator.share({files:[file], title:'Mon Oracle du Jour — Illumin&Son'});
           btn.textContent='✦ Partager ma carte du jour ✦'; btn.disabled=false;
@@ -1664,10 +1820,10 @@ async function partagerCarte(){
 
     const a=document.createElement('a');
     a.href=dataUrl;
-    a.download=`oracle-illuminson-${getToday()}.png`;
+    a.download=`oracle-illuminson-story-${getToday()}.png`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
 
-  }catch(err){ console.error('Erreur génération image:',err); }
+  }catch(err){ console.error('Erreur génération story:',err); }
 
   btn.textContent='✦ Partager ma carte du jour ✦';
   btn.disabled=false;
